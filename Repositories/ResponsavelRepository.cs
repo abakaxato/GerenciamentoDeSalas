@@ -1,5 +1,4 @@
-﻿using System.Data;
-using Microsoft.Data.SqlClient;
+﻿using Microsoft.Data.SqlClient;
 using GerenciamentoSalas.API.Models;
 
 namespace GerenciamentoSalas.API.Repositories
