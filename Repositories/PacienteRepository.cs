@@ -44,5 +44,25 @@ namespace GerenciamentoSalas.API.Repositories
             }
             return lista;
         }
+
+        public int InserirPaciente(Paciente paciente) {
+            using (var conexao = new SqlConnection(_connectionString))
+            {
+                string sql = @"INSERT INTO Pacientes (ResponsavelId, Nome, DataNascimento) 
+                       OUTPUT INSERTED.Id
+                       VALUES (@ResponsavelId, @Nome, @DataNascimento);";
+                using (var comando = new SqlCommand(sql, conexao)) {
+                    comando.Parameters.AddWithValue("@ResponsavelId", paciente.ResponsavelId);
+                    comando.Parameters.AddWithValue("@Nome", paciente.Nome);
+                    comando.Parameters.AddWithValue("@DataNascimento", paciente.DataNascimento);
+
+                    conexao.Open();
+
+                    int idGerado = Convert.ToInt32(comando.ExecuteScalar());
+
+                    return idGerado;
+                }
+            }
+        }
     }
 }

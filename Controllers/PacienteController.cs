@@ -1,4 +1,6 @@
-﻿using GerenciamentoSalas.API.Repositories;
+﻿using GerenciamentoSalas.API.Models;
+using GerenciamentoSalas.API.Repositories;
+using GerenciamentoSalas.API.Requests;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GerenciamentoSalas.API.Controllers
@@ -24,6 +26,30 @@ namespace GerenciamentoSalas.API.Controllers
             catch(Exception ex) {
                 return StatusCode(500, $"Erro Interno no servidor{ex.Message}");
             }
+        }
+
+        [HttpPost]
+        public IActionResult InserirPaciente([FromBody] CriarPacienteRequest request) {
+            try {
+
+                if (request == null) return BadRequest("Dados inválidos.");
+                
+                var novoPaciente = new Paciente {
+                    ResponsavelId = request.ResponsavelId,
+                    Nome = request.Nome,
+                    DataNascimento = request.DataNascimento,
+                };
+                int idGerado = _pacienteRepository.InserirPaciente(novoPaciente);
+
+                novoPaciente.Id = idGerado;
+                novoPaciente.DataCadastro = DateTime.Now;
+
+                return StatusCode(201, novoPaciente);
+
+            }catch (Exception ex) {
+                return StatusCode(500, $"Erro ao salvar: {ex.Message}");
+            }
+
         }
     }
 }

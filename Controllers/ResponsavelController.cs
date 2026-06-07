@@ -38,7 +38,7 @@ namespace GerenciamentoSalas.API.Controllers
             }
         }
         [HttpPost]
-        public IActionResult Criar([FromBody] CriarResponsavelRequest input) // 👈 Aceita o DTO aqui
+        public IActionResult InserirResponsavel([FromBody] CriarResponsavelRequest input) // Aceita o DTO aqui
         {
             try
             {
