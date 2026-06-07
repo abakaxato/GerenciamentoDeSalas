@@ -11,12 +11,12 @@ namespace GerenciamentoSalas.API.Controllers
     [Route("api/[controller]")]
     public class ResponsavelController : ControllerBase
     {
-        private readonly ResponsavelRepository _Responsavelrepository;
+        private readonly ResponsavelRepository _repository;
 
         // 3. O construtor recebe o IConfiguration para repassar ao repositório
         public ResponsavelController(IConfiguration configuration)
         {
-            _Responsavelrepository = new ResponsavelRepository(configuration);
+            _repository = new ResponsavelRepository(configuration);
         }
 
         // 4. Mapeia as requisições HTTP GET para este método
@@ -54,7 +54,7 @@ namespace GerenciamentoSalas.API.Controllers
                 };
 
                 // 3. O Repository insere no SQL Server e te devolve o ID gerado pelo IDENTITY
-                int idGerado = _Responsavelrepository.Inserir(novoResponsavel);
+                int idGerado = _repository.Inserir(novoResponsavel);
 
                 // 4. Preenchemos o Model com os dados reais gerados pelo banco de dados
                 novoResponsavel.Id = idGerado;

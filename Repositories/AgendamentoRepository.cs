@@ -52,5 +52,25 @@ namespace GerenciamentoSalas.API.Repositories
             }
             return lista;
         }
+
+        public int Inserir(Agendamento agendamento)
+        {
+            using var conexao = new SqlConnection(_connectionString);
+            string sql = @"INSERT INTO Agendamentos (PacienteId, ProfissionalId, SalaId, DataHoraInicio, DataHoraFim, Observacoes, Status) 
+               OUTPUT INSERTED.Id
+               VALUES (@PacienteId, @ProfissionalId, @SalaId, @DataHoraInicio, @DataHoraFim, @Observacoes, @Status);";
+
+            using var comando = new SqlCommand(sql, conexao);
+            comando.Parameters.AddWithValue("@PacienteId", agendamento.PacienteId);
+            comando.Parameters.AddWithValue("@ProfissionalId", agendamento.ProfissionalId);
+            comando.Parameters.AddWithValue("@SalaId", agendamento.SalaId);
+            comando.Parameters.AddWithValue("@DataHoraInicio", agendamento.DataHoraInicio);
+            comando.Parameters.AddWithValue("@DataHoraFim", agendamento.DataHoraFim);
+            comando.Parameters.AddWithValue("@Observacoes", agendamento.Observacoes ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@Status", agendamento.Status ?? (object)DBNull.Value);
+
+            conexao.Open();
+            return Convert.ToInt32(comando.ExecuteScalar());
+        }
     }
 }

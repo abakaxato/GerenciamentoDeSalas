@@ -9,10 +9,10 @@ namespace GerenciamentoSalas.API.Controllers
     [Route("api/[controller]")]
     public class PacienteController : ControllerBase
     {
-        private readonly PacienteRepository _pacienteRepository;
+        private readonly PacienteRepository _repository;
 
         public PacienteController(IConfiguration configuration) {
-            _pacienteRepository = new PacienteRepository(configuration);
+            _repository = new PacienteRepository(configuration);
         }
 
         [HttpGet]
@@ -20,7 +20,7 @@ namespace GerenciamentoSalas.API.Controllers
         {
             try
             {
-                var pacientes = _pacienteRepository.ObterTodos();
+                var pacientes = _repository.ObterTodos();
                 return Ok(pacientes);
             }
             catch(Exception ex) {
@@ -39,7 +39,7 @@ namespace GerenciamentoSalas.API.Controllers
                     Nome = request.Nome,
                     DataNascimento = request.DataNascimento,
                 };
-                int idGerado = _pacienteRepository.InserirPaciente(novoPaciente);
+                int idGerado = _repository.InserirPaciente(novoPaciente);
 
                 novoPaciente.Id = idGerado;
                 novoPaciente.DataCadastro = DateTime.Now;

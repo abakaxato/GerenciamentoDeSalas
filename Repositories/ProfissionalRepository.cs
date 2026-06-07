@@ -43,5 +43,21 @@ namespace GerenciamentoSalas.API.Repositories
             }
             return lista;
         }
+
+        public int Inserir(Profissional profissional)
+        {
+            using var conexao = new SqlConnection(_connectionString);
+            string sql = @"INSERT INTO Profissionais (Nome, Especialidade, Ativo) 
+                   OUTPUT INSERTED.Id
+                   VALUES (@Nome, @Especialidade, @Ativo);";
+
+            using var comando = new SqlCommand(sql, conexao);
+            comando.Parameters.AddWithValue("@Nome", profissional.Nome);
+            comando.Parameters.AddWithValue("@Especialidade", profissional.Especialidade);
+            comando.Parameters.AddWithValue("@Ativo", profissional.Ativo);
+
+            conexao.Open();
+            return Convert.ToInt32(comando.ExecuteScalar());
+        }
     }
 }

@@ -42,5 +42,21 @@ namespace GerenciamentoSalas.API.Repositories
             }
             return lista;
         }
+
+        public int Inserir(Sala sala)
+        {
+            using var conexao = new SqlConnection(_connectionString);
+            string sql = @"INSERT INTO Salas (Nome, Capacidade, Ativa) 
+                   OUTPUT INSERTED.Id
+                   VALUES (@Nome, @Capacidade, @Ativa);";
+
+            using var comando = new SqlCommand(sql, conexao);
+            comando.Parameters.AddWithValue("@Nome", sala.Nome);
+            comando.Parameters.AddWithValue("@Capacidade", sala.Capacidade);
+            comando.Parameters.AddWithValue("@Ativa", sala.Ativa);
+
+            conexao.Open();
+            return Convert.ToInt32(comando.ExecuteScalar());
+        }
     }
 }

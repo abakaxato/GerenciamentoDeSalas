@@ -8,7 +8,7 @@
         public int SalaId { get; set; }
         public DateTime DataHoraInicio { get; set; }
         public DateTime DataHoraFim { get; set; }
-        public string Status { get; set; } = string.Empty;
+        public string? Status { get; set; } = string.Empty;
         public string? Observacoes { get; set; } = string.Empty;
     }
 }

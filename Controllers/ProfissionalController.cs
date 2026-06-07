@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using GerenciamentoSalas.API.DTOs;
+using GerenciamentoSalas.API.Models;
 using GerenciamentoSalas.API.Repositories;
+using Microsoft.AspNetCore.Mvc;
 
 namespace GerenciamentoSalas.API.Controllers
 {
@@ -25,6 +27,31 @@ namespace GerenciamentoSalas.API.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, $"Erro interno no servidor ao buscar profissionais: {ex.Message}");
+            }
+        }
+
+        [HttpPost]
+        public IActionResult Criar([FromBody] CriarProfissionalRequest input)
+        {
+            try
+            {
+                if (input == null) return BadRequest("Dados inválidos.");
+
+                var profissional = new Profissional
+                {
+                    Nome = input.Nome,
+                    Especialidade = input.Especialidade,
+                    Ativo = input.Ativo
+                };
+
+                int idGerado = _repository.Inserir(profissional);
+                profissional.Id = idGerado;
+
+                return StatusCode(201, profissional);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Erro ao salvar profissional: {ex.Message}");
             }
         }
     }
