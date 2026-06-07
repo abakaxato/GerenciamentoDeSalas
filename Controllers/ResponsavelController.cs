@@ -9,12 +9,12 @@ namespace GerenciamentoSalas.API.Controllers
     [Route("api/[controller]")]
     public class ResponsavelController : ControllerBase
     {
-        private readonly ResponsavelRepository _repository;
+        private readonly ResponsavelRepository _Responsavelrepository;
 
         // 3. O construtor recebe o IConfiguration para repassar ao repositório
         public ResponsavelController(IConfiguration configuration)
         {
-            _repository = new ResponsavelRepository(configuration);
+            _Responsavelrepository = new ResponsavelRepository(configuration);
         }
 
         // 4. Mapeia as requisições HTTP GET para este método
@@ -24,7 +24,7 @@ namespace GerenciamentoSalas.API.Controllers
             try
             {
                 // 5. Aciona o repositório para buscar a lista do banco
-                var responsaveis = _repository.ObterTodos();
+                var responsaveis = _Responsavelrepository.ObterTodos();
 
                 // 6. Retorna o Status HTTP 200 (OK) e serializa a lista automaticamente em formato JSON
                 return Ok(responsaveis);
