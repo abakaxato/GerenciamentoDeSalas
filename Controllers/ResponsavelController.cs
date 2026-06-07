@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using GerenciamentoSalas.API.DTOs;
+using GerenciamentoSalas.API.Models;
 using GerenciamentoSalas.API.Repositories;
+using Microsoft.AspNetCore.Mvc;
 
 namespace GerenciamentoSalas.API.Controllers
 {
@@ -33,6 +35,37 @@ namespace GerenciamentoSalas.API.Controllers
             {
                 // 7. Em caso de falha catastrófica (ex: banco fora do ar), retorna HTTP 500 (Internal Server Error)
                 return StatusCode(500, $"Erro interno no servidor: {ex.Message}");
+            }
+        }
+        [HttpPost]
+        public IActionResult Criar([FromBody] CriarResponsavelRequest input) // 👈 Aceita o DTO aqui
+        {
+            try
+            {
+                if (input == null) return BadRequest("Dados inválidos.");
+
+                // 2. MAPEAMENTO: Você extrai as variáveis que quis e monta o Model real
+                var novoResponsavel = new Responsavel
+                {
+                    Nome = input.Nome,
+                    Telefone = input.Telefone,
+                    Email = input.Email
+                    // O Id começa como 0 e a DataCadastro como DateTime.MinValue automaticamente no C#
+                };
+
+                // 3. O Repository insere no SQL Server e te devolve o ID gerado pelo IDENTITY
+                int idGerado = _Responsavelrepository.Inserir(novoResponsavel);
+
+                // 4. Preenchemos o Model com os dados reais gerados pelo banco de dados
+                novoResponsavel.Id = idGerado;
+                novoResponsavel.DataCadastro = DateTime.Now; // Apenas para exibir na resposta o horário aproximado
+
+                // 5. RESPOSTA COMPLETA: O usuário recebe o Model cheio, com o ID e a Data criados!
+                return StatusCode(201, novoResponsavel);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Erro ao salvar: {ex.Message}");
             }
         }
     }

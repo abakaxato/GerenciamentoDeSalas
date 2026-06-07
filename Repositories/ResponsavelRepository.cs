@@ -53,5 +53,32 @@ namespace GerenciamentoSalas.API.Repositories
 
             return lista;
         }
+        public int Inserir(Responsavel responsavel)
+        {
+            using (var conexao = new SqlConnection(_connectionString))
+            {
+                // 1. Usamos a cláusula OUTPUT INSERTED.Id para o SQL Server nos devolver o ID gerado na hora
+                string sql = @"INSERT INTO Responsaveis (Nome, Telefone, Email) 
+                       OUTPUT INSERTED.Id
+                       VALUES (@Nome, @Telefone, @Email);";
+
+                using (var comando = new SqlCommand(sql, conexao))
+                {
+                    // 2. SEGURANÇA MÁXIMA: Proteção contra SQL Injection usando Parâmetros
+                    comando.Parameters.AddWithValue("@Nome", responsavel.Nome);
+                    comando.Parameters.AddWithValue("@Telefone", responsavel.Telefone);
+
+                    // Tratamento técnico para persistir NULL se o e-mail não for informado
+                    comando.Parameters.AddWithValue("@Email", responsavel.Email ?? (object)DBNull.Value);
+
+                    conexao.Open();
+
+                    // 3. Executa a query e captura o primeiro valor retornado (o ID gerado pelo IDENTITY)
+                    int idGerado = Convert.ToInt32(comando.ExecuteScalar());
+
+                    return idGerado;
+                }
+            }
+        }
     }
 }
