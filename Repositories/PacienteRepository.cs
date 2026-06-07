@@ -18,7 +18,7 @@ namespace GerenciamentoSalas.API.Repositories
 
             using (var conexao = new SqlConnection(_connectionString)) {
                 
-                string sql = "SELECT Id, ReponsavelId, Nome, Telefone, DataDeCadastro FROM Pacientes";
+                string sql = "SELECT Id, ResponsavelId, Nome, DataCadastro, DataNascimento FROM Pacientes";
                 
                 using (var comando = new SqlCommand(sql, conexao)) {
                     
@@ -33,8 +33,9 @@ namespace GerenciamentoSalas.API.Repositories
                                 Id = Convert.ToInt32(reader["Id"]),
                                 ResponsavelId = Convert.ToInt32(reader["ResponsavelId"]),
                                 Nome = reader["Nome"].ToString() ?? string.Empty,
-                                Telefone = reader["Telefone"].ToString() ?? string.Empty,
-                                DataCadastro = Convert.ToDateTime(reader["DataCadastro"])
+                                DataCadastro = Convert.ToDateTime(reader["DataCadastro"]),
+                                DataNascimento = reader["DataNascimento"] != DBNull.Value ? 
+                                    Convert.ToDateTime(reader["DataNascimento"]) : null
                             };
                             lista.Add(paci);
                         }
