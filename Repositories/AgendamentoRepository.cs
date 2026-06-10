@@ -1,6 +1,7 @@
 ﻿using System.Data;
 using Microsoft.Data.SqlClient;
 using GerenciamentoSalas.API.Models;
+using GerenciamentoSalas.API.Requests;
 
 namespace GerenciamentoSalas.API.Repositories
 {
@@ -71,6 +72,29 @@ namespace GerenciamentoSalas.API.Repositories
 
             conexao.Open();
             return Convert.ToInt32(comando.ExecuteScalar());
+        }
+
+        public int DeletarAgendamento( Agendamento agendamento) {
+            
+            using var conexao = new SqlConnection(_connectionString);
+            
+            string sql = @"delete Agendamentos
+                output deleted.id
+                from Agendamentos
+                inner join Salas on Agendamentos.SalaId = Salas.Id
+                where DataHoraInicio = @DataHoraInicio and DataHoraFim = @DataHoraFim and salas.Id = @SalaId";
+
+            using var comando = new SqlCommand(sql, conexao);
+
+            comando.Parameters.AddWithValue("@DataHoraInicio", agendamento.DataHoraInicio);
+            comando.Parameters.AddWithValue("@DataHoraFim", agendamento.DataHoraFim);
+            comando.Parameters.AddWithValue("@SalaId", agendamento.SalaId);
+
+            conexao.Open();
+
+            return Convert.ToInt32(comando.ExecuteScalar());
+
+
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using GerenciamentoSalas.API.DTOs;
 using GerenciamentoSalas.API.Models;
 using GerenciamentoSalas.API.Repositories;
+using GerenciamentoSalas.API.Requests;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GerenciamentoSalas.API.Controllers
@@ -65,6 +66,36 @@ namespace GerenciamentoSalas.API.Controllers
             {
                 return StatusCode(500, $"Erro ao salvar agendamento: {ex.Message}");
             }
+        }
+
+        [HttpDelete]
+        [Route("api/[controller]/Deletar")]
+        public IActionResult Deletar(DeletarAgendamentoRequest request) {
+
+            try
+            {
+                if (request == null) return BadRequest("Dados inválidos.");
+                
+                if (request.DataHoraFim <= request.DataHoraInicio)
+                {
+                    return BadRequest("A data de término deve ser maior que a data de início.");
+                }
+
+                Agendamento agendamento = new Agendamento
+                {
+                    DataHoraInicio = request.DataHoraInicio,
+                    DataHoraFim = request.DataHoraFim,
+                    SalaId = request.SalaId
+                };
+
+                int idDeletado = _AgendamentoRepository.DeletarAgendamento(agendamento);
+
+                return StatusCode(200, $"O Agendamento com o ID {idDeletado} foi deletado com sucesso");
+            }
+            catch (Exception ex) {
+                return StatusCode(500, $"Erro ao Deletar agendamento: {ex.Message}");
+            }
+
         }
     }
 }

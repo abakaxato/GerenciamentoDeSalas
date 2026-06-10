@@ -5,9 +5,9 @@
         public int Id { get; set; }
         public int PacienteId { get; set; }
         public int ProfissionalId { get; set; }
-        public int SalaId { get; set; }
-        public DateTime DataHoraInicio { get; set; }
-        public DateTime DataHoraFim { get; set; }
+        public required int SalaId { get; set; }
+        public required DateTime DataHoraInicio { get; set; }
+        public required DateTime DataHoraFim { get; set; }
         public string? Status { get; set; } = string.Empty;
         public string? Observacoes { get; set; } = string.Empty;
     }
