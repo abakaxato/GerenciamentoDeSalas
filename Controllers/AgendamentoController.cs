@@ -9,19 +9,20 @@ namespace GerenciamentoSalas.API.Controllers
     [Route("api/[controller]")]
     public class AgendamentoController : ControllerBase
     {
-        private readonly AgendamentoRepository _repository;
+        private readonly AgendamentoRepository _AgendamentoRepository;
 
         public AgendamentoController(IConfiguration configuration)
         {
-            _repository = new AgendamentoRepository(configuration);
+            _AgendamentoRepository = new AgendamentoRepository(configuration);
         }
 
         [HttpGet]
+        [Route("api/[controller]/ObterTodos")]
         public IActionResult ObterTodos()
         {
             try
             {
-                var agendamentos = _repository.ObterTodos();
+                var agendamentos = _AgendamentoRepository.ObterTodosAgendamento();
                 return Ok(agendamentos);
             }
             catch (Exception ex)
@@ -31,7 +32,8 @@ namespace GerenciamentoSalas.API.Controllers
         }
 
         [HttpPost]
-        public IActionResult Criar([FromBody] CriarAgendamentoRequest input)
+        [Route("api/[controller]/Inserir")]
+        public IActionResult Inserir([FromBody] CriarAgendamentoRequest input)
         {
             try
             {
@@ -54,7 +56,7 @@ namespace GerenciamentoSalas.API.Controllers
                     Status = input.Status
                 };
 
-                int idGerado = _repository.Inserir(agendamento);
+                int idGerado = _AgendamentoRepository.InserirAgendamento(agendamento);
                 agendamento.Id = idGerado;
 
                 return StatusCode(201, agendamento);

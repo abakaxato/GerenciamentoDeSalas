@@ -11,22 +11,23 @@ namespace GerenciamentoSalas.API.Controllers
     [Route("api/[controller]")]
     public class ResponsavelController : ControllerBase
     {
-        private readonly ResponsavelRepository _repository;
+        private readonly ResponsavelRepository _ResponsavelRepository;
 
         // 3. O construtor recebe o IConfiguration para repassar ao repositório
         public ResponsavelController(IConfiguration configuration)
         {
-            _repository = new ResponsavelRepository(configuration);
+            _ResponsavelRepository = new ResponsavelRepository(configuration);
         }
 
         // 4. Mapeia as requisições HTTP GET para este método
         [HttpGet]
+        [Route("api/[controller]/ObterTodos")]
         public IActionResult ObterTodos()
         {
             try
             {
                 // 5. Aciona o repositório para buscar a lista do banco
-                var responsaveis = _Responsavelrepository.ObterTodos();
+                var responsaveis = _ResponsavelRepository.ObterTodosResponsavel();
 
                 // 6. Retorna o Status HTTP 200 (OK) e serializa a lista automaticamente em formato JSON
                 return Ok(responsaveis);
@@ -38,7 +39,8 @@ namespace GerenciamentoSalas.API.Controllers
             }
         }
         [HttpPost]
-        public IActionResult InserirResponsavel([FromBody] CriarResponsavelRequest input) // Aceita o DTO aqui
+        [Route("api/[controller]/Inserir")]
+        public IActionResult Inserir([FromBody] CriarResponsavelRequest input) // Aceita o DTO aqui
         {
             try
             {
@@ -54,7 +56,7 @@ namespace GerenciamentoSalas.API.Controllers
                 };
 
                 // 3. O Repository insere no SQL Server e te devolve o ID gerado pelo IDENTITY
-                int idGerado = _repository.Inserir(novoResponsavel);
+                int idGerado = _ResponsavelRepository.Inserir(novoResponsavel);
 
                 // 4. Preenchemos o Model com os dados reais gerados pelo banco de dados
                 novoResponsavel.Id = idGerado;

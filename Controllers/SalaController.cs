@@ -9,19 +9,20 @@ namespace GerenciamentoSalas.API.Controllers
     [Route("api/[controller]")]
     public class SalaController : ControllerBase
     {
-        private readonly SalaRepository _repository;
+        private readonly SalaRepository _SalaRepository;
 
         public SalaController(IConfiguration configuration)
         {
-            _repository = new SalaRepository(configuration);
+            _SalaRepository = new SalaRepository(configuration);
         }
 
         [HttpGet]
+        [Route("api/[controller]/ObterTodos")]
         public IActionResult ObterTodos()
         {
             try
             {
-                var salas = _repository.ObterTodos();
+                var salas = _SalaRepository.ObterTodosSala();
                 return Ok(salas);
             }
             catch (Exception ex)
@@ -31,7 +32,8 @@ namespace GerenciamentoSalas.API.Controllers
         }
 
         [HttpPost]
-        public IActionResult Criar([FromBody] CriarSalaRequest input)
+        [Route("api/[controller]/Inserir")]
+        public IActionResult Inserir([FromBody] CriarSalaRequest input)
         {
             try
             {
@@ -44,7 +46,7 @@ namespace GerenciamentoSalas.API.Controllers
                     Ativa = input.Ativa
                 };
 
-                int idGerado = _repository.Inserir(sala);
+                int idGerado = _SalaRepository.InserirSala(sala);
                 sala.Id = idGerado;
 
                 return StatusCode(201, sala);

@@ -9,19 +9,20 @@ namespace GerenciamentoSalas.API.Controllers
     [Route("api/[controller]")]
     public class ProfissionalController : ControllerBase
     {
-        private readonly ProfissionalRepository _repository;
+        private readonly ProfissionalRepository _ProfissionalRepository;
 
         public ProfissionalController(IConfiguration configuration)
         {
-            _repository = new ProfissionalRepository(configuration);
+            _ProfissionalRepository = new ProfissionalRepository(configuration);
         }
 
         [HttpGet]
+        [Route("api/[controller]/ObterTodos")]
         public IActionResult ObterTodos()
         {
             try
             {
-                var profissionais = _repository.ObterTodos();
+                var profissionais = _ProfissionalRepository.ObterTodosProfissional();
                 return Ok(profissionais);
             }
             catch (Exception ex)
@@ -31,7 +32,8 @@ namespace GerenciamentoSalas.API.Controllers
         }
 
         [HttpPost]
-        public IActionResult Criar([FromBody] CriarProfissionalRequest input)
+        [Route("api/[controller]/Inserir")]
+        public IActionResult Inserir([FromBody] CriarProfissionalRequest input)
         {
             try
             {
@@ -44,7 +46,7 @@ namespace GerenciamentoSalas.API.Controllers
                     Ativo = input.Ativo
                 };
 
-                int idGerado = _repository.Inserir(profissional);
+                int idGerado = _ProfissionalRepository.InserirProfissional(profissional);
                 profissional.Id = idGerado;
 
                 return StatusCode(201, profissional);

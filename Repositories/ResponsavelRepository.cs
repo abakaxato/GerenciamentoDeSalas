@@ -14,7 +14,7 @@ namespace GerenciamentoSalas.API.Repositories
                 ?? throw new ArgumentNullException("String de conexão não encontrada.");
         }
 
-        public List<Responsavel> ObterTodos()
+        public List<Responsavel> ObterTodosResponsavel()
         {
             var lista = new List<Responsavel>();
 

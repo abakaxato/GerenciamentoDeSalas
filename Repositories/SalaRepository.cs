@@ -14,7 +14,7 @@ namespace GerenciamentoSalas.API.Repositories
                 ?? throw new ArgumentNullException("String de conexão não encontrada.");
         }
 
-        public List<Sala> ObterTodos()
+        public List<Sala> ObterTodosSala()
         {
             var lista = new List<Sala>();
 
@@ -43,7 +43,7 @@ namespace GerenciamentoSalas.API.Repositories
             return lista;
         }
 
-        public int Inserir(Sala sala)
+        public int InserirSala(Sala sala)
         {
             using var conexao = new SqlConnection(_connectionString);
             string sql = @"INSERT INTO Salas (Nome, Capacidade, Ativa) 
