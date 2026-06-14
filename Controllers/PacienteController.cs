@@ -16,7 +16,7 @@ namespace GerenciamentoSalas.API.Controllers
         }
 
         [HttpGet]
-        [Route("api/[controller]/ObterTodos")]
+        [Route("api/[controller]")]
         public IActionResult ObterTodos()
         {
             try
@@ -30,7 +30,7 @@ namespace GerenciamentoSalas.API.Controllers
         }
 
         [HttpPost]
-        [Route("api/[controller]/Inserir")]
+        [Route("api/[controller]")]
         public IActionResult Inserir([FromBody] CriarPacienteRequest request) {
             try {
 
