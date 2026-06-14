@@ -1,5 +1,6 @@
 ﻿using Microsoft.Data.SqlClient;
 using GerenciamentoSalas.API.Models;
+using GerenciamentoSalas.API.Requests;
 
 namespace GerenciamentoSalas.API.Repositories
 {
@@ -63,6 +64,31 @@ namespace GerenciamentoSalas.API.Repositories
                     return idGerado;
                 }
             }
+        }
+
+        public int DeletarPaciente(DeletarPacienteRequest deletarPacienteRequest) {
+
+            using (var conexao = new SqlConnection(_connectionString))
+            {
+                string sql = @"DELETE Pacientes
+                    OUTPUT deleted.Id 
+                    FROM [bd_gerenciamento].[dbo].[Pacientes] 
+                    inner join [bd_gerenciamento].[dbo].[Responsaveis] on Pacientes.ResponsavelId = Responsaveis.Id 
+                    WHERE Pacientes.Nome = @nomePaciente and Responsaveis.Nome = @nomeResponsavel";
+                
+                using (var comando = new SqlCommand(sql, conexao)) {
+                    
+                    comando.Parameters.AddWithValue("@nomePaciete", deletarPacienteRequest.NomePaciente);
+                    comando.Parameters.AddWithValue("@nomeResponsavel", deletarPacienteRequest.NomeResponsavel);
+                    
+                    conexao.Open();
+
+                    int idDeletado = Convert.ToInt32(comando.ExecuteScalar());
+
+                    return idDeletado;
+                }
+            }
+        
         }
     }
 }
