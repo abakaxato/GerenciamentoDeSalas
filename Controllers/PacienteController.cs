@@ -46,12 +46,25 @@ namespace GerenciamentoSalas.API.Controllers
                 novoPaciente.Id = idGerado;
                 novoPaciente.DataCadastro = DateTime.Now;
 
-                return StatusCode(201, novoPaciente);
+                return StatusCode(201, $"O novo paciente foi criado com o ID :{novoPaciente}");
 
             }catch (Exception ex) {
                 return StatusCode(500, $"Erro ao salvar: {ex.Message}");
             }
 
+        }
+
+        [HttpDelete]
+        [Route("api/[controller]")]
+        public IActionResult DeletarPaciente(DeletarPacienteRequest deletarPacienteRequest) {
+            try
+            {
+                var (linhasDeletadas,idDeletado) = _PacienteRepository.DeletarPaciente(deletarPacienteRequest);
+                return StatusCode(200, $"Agendamentos deletados : {linhasDeletadas} \nID deletado : {idDeletado}");
+            }
+            catch (Exception ex) {
+                return StatusCode(500, $"Erro ao Deletar: {ex.Message}");
+            }
         }
     }
 }
