@@ -92,7 +92,9 @@ namespace GerenciamentoSalas.API.Repositories
 
             conexao.Open();
 
-            return Convert.ToInt32(comando.ExecuteScalar());
+            int idDeletado = Convert.ToInt32(comando.ExecuteScalar());
+
+            return idDeletado;
 
 
         }
