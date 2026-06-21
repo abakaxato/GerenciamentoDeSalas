@@ -1,73 +1,85 @@
-﻿using GerenciamentoSalas.API.DTOs;
+﻿using System;
+using System.Threading.Tasks;
+using GerenciamentoSalas.API.DTOs;
 using GerenciamentoSalas.API.Models;
 using GerenciamentoSalas.API.Repositories;
+using GerenciamentoSalas.API.Requests;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GerenciamentoSalas.API.Controllers
 {
-    // 1. Define que esta classe é um Controlador de API e ativa comportamentos automáticos de validação
     [ApiController]
-    // 2. Define a rota de acesso padrão baseada no nome do controller: "api/responsavel"
     [Route("api/[controller]")]
     public class ResponsavelController : ControllerBase
     {
         private readonly ResponsavelRepository _ResponsavelRepository;
 
-        // 3. O construtor recebe o IConfiguration para repassar ao repositório
         public ResponsavelController(IConfiguration configuration)
         {
             _ResponsavelRepository = new ResponsavelRepository(configuration);
         }
 
-        // 4. Mapeia as requisições HTTP GET para este método
         [HttpGet]
-        [Route("api/[controller]")]
-        public IActionResult ObterTodos()
+        public async Task<IActionResult> ObterTodos()
         {
             try
             {
-                // 5. Aciona o repositório para buscar a lista do banco
-                var responsaveis = _ResponsavelRepository.ObterTodosResponsavel();
-
-                // 6. Retorna o Status HTTP 200 (OK) e serializa a lista automaticamente em formato JSON
+                var responsaveis = await _ResponsavelRepository.ObterTodosResponsavelAsync();
                 return Ok(responsaveis);
             }
             catch (Exception ex)
             {
-                // 7. Em caso de falha catastrófica (ex: banco fora do ar), retorna HTTP 500 (Internal Server Error)
                 return StatusCode(500, $"Erro interno no servidor: {ex.Message}");
             }
         }
+
         [HttpPost]
-        [Route("api/[controller]")]
-        public IActionResult Inserir([FromBody] CriarResponsavelRequest input) // Aceita o DTO aqui
+        public async Task<IActionResult> Inserir([FromBody] CriarResponsavelRequest input)
         {
             try
             {
                 if (input == null) return BadRequest("Dados inválidos.");
 
-                // 2. MAPEAMENTO: Você extrai as variáveis que quis e monta o Model real
                 var novoResponsavel = new Responsavel
                 {
                     Nome = input.Nome,
                     Telefone = input.Telefone,
                     Email = input.Email
-                    // O Id começa como 0 e a DataCadastro como DateTime.MinValue automaticamente no C#
                 };
 
-                // 3. O Repository insere no SQL Server e te devolve o ID gerado pelo IDENTITY
-                int idGerado = _ResponsavelRepository.Inserir(novoResponsavel);
+                int idGerado = await _ResponsavelRepository.InserirAsync(novoResponsavel);
 
-                // 4. Preenchemos o Model com os dados reais gerados pelo banco de dados
                 novoResponsavel.Id = idGerado;
-                novoResponsavel.DataCadastro = DateTime.Now; // Apenas para exibir na resposta o horário aproximado
+                novoResponsavel.DataCadastro = DateTime.Now;
 
-                // 5. RESPOSTA COMPLETA: O usuário recebe o Model cheio, com o ID e a Data criados!
                 return StatusCode(201, novoResponsavel);
             }
             catch (Exception ex)
             {
                 return StatusCode(500, $"Erro ao salvar: {ex.Message}");
+            }
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> Deletar([FromBody]int id)
+        {
+            try
+            {
+                var request = new DeletarResponsavelRequest { ResponsavelId = id };
+                var (agendamentosDeletados, idsPacientesDeletados, responsavelDeletado) =
+                    await _ResponsavelRepository.DeletarResponsavelAsync(request);
+
+                return Ok(new
+                {
+                    AgendamentosDeletados = agendamentosDeletados,
+                    PacientesDeletados = idsPacientesDeletados.Count,
+                    IdsPacientesDeletados = idsPacientesDeletados,
+                    ResponsavelDeletado = responsavelDeletado
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Erro ao deletar: {ex.Message}");
             }
         }
     }
