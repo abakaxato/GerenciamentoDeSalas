@@ -2,8 +2,7 @@
 {
     public class DeletarPacienteRequest
     {
-        public required string NomePaciente { get; set; }
-        public required string NomeResponsavel { get; set; }
-
+        public required int PacienteId { get; set; }
+        
     }
 }

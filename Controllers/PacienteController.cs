@@ -56,10 +56,10 @@ namespace GerenciamentoSalas.API.Controllers
 
         [HttpDelete]
         [Route("api/[controller]")]
-        public IActionResult DeletarPaciente(DeletarPacienteRequest deletarPacienteRequest) {
+        public async Task <IActionResult>DeletarPacienteAsync(DeletarPacienteRequest deletarPacienteRequest) {
             try
             {
-                var (linhasDeletadas,idDeletado) = _PacienteRepository.DeletarPaciente(deletarPacienteRequest);
+                var (linhasDeletadas,idDeletado) = await _PacienteRepository.DeletarPacienteAsync(deletarPacienteRequest);
                 return StatusCode(200, $"Agendamentos deletados : {linhasDeletadas} \nID deletado : {idDeletado}");
             }
             catch (Exception ex) {

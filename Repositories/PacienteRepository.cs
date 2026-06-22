@@ -66,44 +66,49 @@ namespace GerenciamentoSalas.API.Repositories
             }
         }
 
-        public (int AgendamentosDeletados, int IdPacienteDeletado) DeletarPaciente(DeletarPacienteRequest deletarPacienteRequest)
+        public async Task<(int AgendamentosDeletados, int IdPacienteDeletado)> DeletarPacienteAsync(DeletarPacienteRequest deletarPacienteRequest)
         {
-            using (var conexao = new SqlConnection(_connectionString))
+            using var conexao = new SqlConnection(_connectionString);
+            await conexao.OpenAsync();
+            using var transaction = conexao.BeginTransaction();
+            try
             {
-                conexao.Open();
+                string sql = @"
+                    DELETE A
+                    FROM dbo.Agendamentos A
+                    INNER JOIN dbo.Pacientes P ON A.PacienteId = P.Id
+                    WHERE P.Id = @PacienteId;
+                    SELECT @@ROWCOUNT;";
 
-                string sql = @"DELETE dbo.Agendamentos 
-                       FROM dbo.Agendamentos 
-                       INNER JOIN dbo.Pacientes ON Agendamentos.PacienteId = Pacientes.Id 
-                       INNER JOIN dbo.responsaveis ON Pacientes.ResponsavelId = Responsaveis.Id 
-                       WHERE Pacientes.Nome = @NomePaciente AND Responsaveis.Nome = @NomeResponsavel; 
-                       SELECT @@ROWCOUNT;";
-
-                int linhasDeletadas = 0;
-                using (var DelAgendamento = new SqlCommand(sql, conexao))
+                int AgendamentosDeletados = 0;
+                using (var DelAgendamento = new SqlCommand(sql, conexao,transaction))
                 {
-                    DelAgendamento.Parameters.AddWithValue("@NomePaciente", deletarPacienteRequest.NomePaciente);
-                    DelAgendamento.Parameters.AddWithValue("@NomeResponsavel", deletarPacienteRequest.NomeResponsavel);
+                    DelAgendamento.Parameters.AddWithValue("@PacienteId", deletarPacienteRequest.PacienteId);
 
-                    linhasDeletadas = Convert.ToInt32(DelAgendamento.ExecuteScalar());
+                    AgendamentosDeletados = Convert.ToInt32(await DelAgendamento.ExecuteScalarAsync());
                 }
 
-                string sql2 = @"DELETE Pacientes 
-                        OUTPUT deleted.Id 
-                        FROM [bd_gerenciamento].[dbo].[Pacientes] 
-                        INNER JOIN [bd_gerenciamento].[dbo].[Responsaveis] ON Pacientes.ResponsavelId = Responsaveis.Id 
-                        WHERE Pacientes.Nome = @NomePaciente AND Responsaveis.Nome = @NomeResponsavel";
+                string sql2 = @"
+                    DELETE P
+                    OUTPUT deleted.Id
+                    FROM dbo.Pacientes P
+                    WHERE P.Id = @PacienteId;";
 
                 int idDeletado = 0;
-                using (var delPaciente = new SqlCommand(sql2, conexao))
+                using (var delPaciente = new SqlCommand(sql2, conexao,transaction))
                 {
-                    delPaciente.Parameters.AddWithValue("@NomePaciente", deletarPacienteRequest.NomePaciente);
-                    delPaciente.Parameters.AddWithValue("@NomeResponsavel", deletarPacienteRequest.NomeResponsavel);
+                    delPaciente.Parameters.AddWithValue("@PacienteId", deletarPacienteRequest.PacienteId);
 
-                    idDeletado = Convert.ToInt32(delPaciente.ExecuteScalar());
+                    idDeletado = Convert.ToInt32(await delPaciente.ExecuteScalarAsync());
                 }
-                return (linhasDeletadas, idDeletado);
+                transaction.Commit();
+                return (AgendamentosDeletados, idDeletado);
             }
+            catch (Exception ex){
+                transaction.Rollback();
+                throw new InvalidOperationException("Falha ao deletar paciente", ex);
+            }
+            
         }
 
     }
