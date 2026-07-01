@@ -6,11 +6,11 @@ using GerenciamentoSalas.API.Requests;
 
 namespace GerenciamentoSalas.API.Repositories
 {
-    public class ProfissionalRepository
+    public class ProfissionaisRepository
     {
         private readonly string _connectionString;
 
-        public ProfissionalRepository(IConfiguration configuration)
+        public ProfissionaisRepository(IConfiguration configuration)
         {
             _connectionString = configuration.GetConnectionString("ConexaoPadrao")
                 ?? throw new ArgumentNullException("String de conexão não encontrada.");
@@ -62,7 +62,7 @@ namespace GerenciamentoSalas.API.Repositories
             return Convert.ToInt32(comando.ExecuteScalar());
         }
 
-        public async Task<(List<int> IdAgendamentosDeletados, int IdResponsavelDeletado)> DeletarProfissionalAsync(DeletarProfissionalRequest request) {
+        public async Task<(List<int> IdAgendamentosDeletados, int IdResponsavelDeletado)> DeletarProfissionaisAsync(DeletarProfissionalRequest request) {
 
             using var conexao = new SqlConnection(_connectionString);
             await conexao.OpenAsync();
