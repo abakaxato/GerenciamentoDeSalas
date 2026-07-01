@@ -65,7 +65,7 @@ namespace GerenciamentoSalas.API.Controllers
             try
             {
                 var request = new DeletarProfissionalRequest { Id = ProfissionaisId };
-                var (profissionaisDeletados, agendamentosDeletados) =
+                var (agendamentosDeletados, profissionaisDeletados) =
                     await _ProfissionaisRepository.DeletarProfissionaisAsync(request);
 
                 return Ok(new
