@@ -103,7 +103,7 @@ namespace GerenciamentoSalas.API.Repositories
                 transaction.Commit();
                 return (idDeletadoSala, IdsDeletadosAgendamento);
             }
-            catch (Exception ex){
+            catch (Exception){
                 transaction.Rollback();
                 throw;
             }
