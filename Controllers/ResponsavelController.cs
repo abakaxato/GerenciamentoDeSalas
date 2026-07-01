@@ -79,7 +79,7 @@ namespace GerenciamentoSalas.API.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Erro ao deletar: {ex.Message}");
+                return StatusCode(500, $"Erro ao deletar Responsavel: {ex.Message}");
             }
         }
     }

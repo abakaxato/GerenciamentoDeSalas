@@ -63,7 +63,7 @@ namespace GerenciamentoSalas.API.Controllers
                 return StatusCode(200, $"Agendamentos deletados : {linhasDeletadas} \nID deletado : {idDeletado}");
             }
             catch (Exception ex) {
-                return StatusCode(500, $"Erro ao Deletar: {ex.Message}");
+                return StatusCode(500, $"Erro ao Deletar Paciente: {ex.Message}");
             }
         }
     }
