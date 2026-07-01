@@ -1,6 +1,7 @@
 ﻿using GerenciamentoSalas.API.DTOs;
 using GerenciamentoSalas.API.Models;
 using GerenciamentoSalas.API.Repositories;
+using GerenciamentoSalas.API.Requests;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GerenciamentoSalas.API.Controllers
@@ -54,6 +55,27 @@ namespace GerenciamentoSalas.API.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, $"Erro ao salvar sala: {ex.Message}");
+            }
+        }
+        [HttpDelete]
+        [Route("api/[controller]")]
+        public async Task<IActionResult> Deletar([FromBody] int salaId)
+        {
+            try
+            {
+                var request = new DeletarSalaRequest { id = salaId };
+                var (salaDeletada, agendamentosDeletados) =
+                    await _SalaRepository.DeletarSalaAsync(request);
+
+                return Ok(new
+                {
+                    AgendamentosDeletados = agendamentosDeletados,
+                    SalaDeletada = salaDeletada
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Erro ao deletar Sala: {ex.Message}");
             }
         }
     }
