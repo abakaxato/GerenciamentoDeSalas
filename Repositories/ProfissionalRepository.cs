@@ -1,6 +1,8 @@
 ﻿using System.Data;
 using Microsoft.Data.SqlClient;
 using GerenciamentoSalas.API.Models;
+using System.Transactions;
+using GerenciamentoSalas.API.Requests;
 
 namespace GerenciamentoSalas.API.Repositories
 {
@@ -58,6 +60,56 @@ namespace GerenciamentoSalas.API.Repositories
 
             conexao.Open();
             return Convert.ToInt32(comando.ExecuteScalar());
+        }
+
+        public async Task<(List<int> IdAgendamentosDeletados, int IdResponsavelDeletado)> DeletarProfissionalAsync(DeletarProfissionalRequest request) {
+
+            using var conexao = new SqlConnection(_connectionString);
+            await conexao.OpenAsync();
+            using var transaction = conexao.BeginTransaction();
+
+            try {
+
+                string sqlAgendamento = @"DELETE [bd_gerenciamento].[dbo].[Agendamentos]
+                    OUTPUT deleted.Id
+                    FROM [bd_gerenciamento].[dbo].[Agendamentos]
+                    INNER JOIN [bd_gerenciamento].[dbo].[Profissionais] ON [bd_gerenciamento].[dbo].[Profissionais].[Id] = [bd_gerenciamento].[dbo].[Agendamentos].[SalaId]
+                    where [bd_gerenciamento].[dbo].[Profissionais].[Id] = @IdProfissional";
+                
+                var IdsDeletadosAgendamento = new List<int>();
+
+                using (var cmd = new SqlCommand(sqlAgendamento, conexao, transaction))
+                {
+                    cmd.Parameters.AddWithValue("@IdProfissional", request.Id);
+
+                    using var reader = await cmd.ExecuteReaderAsync();
+
+                    while (await reader.ReadAsync())
+                    {
+                        IdsDeletadosAgendamento.Add(reader.GetInt32(0));
+                    }
+                     
+                }
+
+                string sqlProfissionais = @"
+                    DELETE [bd_gerenciamento].[dbo].[Profissionais]
+                    OUTPUT deleted.Id
+                    FROM [bd_gerenciamento].[dbo].[Profissionais]
+                    where [bd_gerenciamento].[dbo].[Profissionais].[Id] = @IdProfissional";
+
+                int idDeletadoProfissionais = 0;
+                using (var cmd = new SqlCommand(sqlProfissionais, conexao, transaction))
+                {
+                    cmd.Parameters.AddWithValue("@IdProfissional", request.Id);
+                    idDeletadoProfissionais = Convert.ToInt32(await cmd.ExecuteScalarAsync());
+                }
+                transaction.Commit();
+                return (IdsDeletadosAgendamento, idDeletadoProfissionais);
+            }
+            catch (Exception) {
+                transaction.Rollback();
+                throw;
+            }
         }
     }
 }
