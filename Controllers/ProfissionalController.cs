@@ -10,14 +10,14 @@ namespace GerenciamentoSalas.API.Controllers
     [Route("api/[controller]")]
     public class ProfissionalController : ControllerBase
     {
-        private readonly ProfissionaisRepository _ProfissionaisRepository;
+        /*private readonly ProfissionaisRepository _ProfissionaisRepository;
 
         public ProfissionalController(IConfiguration configuration)
         {
             _ProfissionaisRepository = new ProfissionaisRepository(configuration);
         }
 
-        [HttpGet]
+        [HttpGet] TempDataAttribute tem que colocar as coisas no singular
         [Route("api/[controller]")]
         public IActionResult ObterTodos()
         {
@@ -79,5 +79,5 @@ namespace GerenciamentoSalas.API.Controllers
                 return StatusCode(500, $"Erro ao deletar Profissionais: {ex.Message}");
             }
         }
-    }
+    */}
 }

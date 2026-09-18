@@ -1,10 +1,15 @@
-﻿namespace GerenciamentoSalas.API.Models
+﻿using System;
+using System.Collections.Generic;
+
+namespace GerenciamentoSalas.API.Models;
+
+public partial class Sala
 {
-    public class Sala
-    {
-        public int Id { get; set;}
-        public string Nome { get; set; } = string.Empty;
-        public int Capacidade { get; set; }
-        public bool Ativa { get; set; }
-    }
+    public int Id { get; set; }
+
+    public string Nome { get; set; } = null!;
+
+    public int? Capacidade { get; set; }
+
+    public virtual ICollection<Agendamento> Agendamentos { get; set; } = new List<Agendamento>();
 }

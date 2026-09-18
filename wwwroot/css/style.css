@@ -1,0 +1,204 @@
+﻿:root {
+    --azul: #005B9F;
+    --amarelo: #F2CD00;
+    --vermelho: #E3000F;
+    --verde: #00A651;
+    --fundo: #F0F8FF;
+    --texto: #333;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: var(--fundo);
+    color: var(--texto);
+    padding-bottom: 2rem;
+}
+
+/* Cabeçalho e Navegação */
+header {
+    background-color: var(--azul);
+    color: white;
+    padding: 1.5rem;
+    text-align: center;
+    border-bottom: 6px solid var(--amarelo);
+}
+
+nav {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+    nav a {
+        text-decoration: none;
+        color: var(--azul);
+        font-weight: bold;
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        transition: 0.3s;
+    }
+
+        nav a:hover {
+            background-color: var(--amarelo);
+            color: #000;
+        }
+
+/* Containers e Formulários */
+.container {
+    max-width: 900px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    border-top: 5px solid var(--azul);
+}
+
+.form-group {
+    margin-bottom: 1.2rem;
+}
+
+label {
+    display: block;
+    margin-bottom: 0.4rem;
+    font-weight: bold;
+    color: #444;
+}
+
+input, select, textarea {
+    width: 100%;
+    padding: 0.8rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+.row {
+    display: flex;
+    gap: 1rem;
+}
+
+    .row > div {
+        flex: 1;
+    }
+
+/* Botões */
+button {
+    background-color: var(--verde);
+    color: white;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    font-size: 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    width: 100%;
+    margin-top: 1rem;
+    transition: 0.3s;
+}
+
+    button:hover {
+        background-color: #008a43;
+    }
+
+    button.btn-azul {
+        background-color: var(--azul);
+    }
+
+        button.btn-azul:hover {
+            background-color: #00457a;
+        }
+
+/* Cards de Agendamento (index.html) */
+.grid-agendamentos {
+    display: grid;
+    gap: 1rem;
+}
+
+.card {
+    background: white;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    border-left: 6px solid var(--verde);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+    .card.em-andamento {
+        border-left-color: var(--amarelo);
+        background-color: #fffdf0;
+    }
+
+    .card.finalizado {
+        border-left-color: var(--vermelho);
+        opacity: 0.6;
+    }
+
+.info h3 {
+    color: var(--azul);
+    margin-bottom: 0.5rem;
+}
+
+.info p {
+    margin-bottom: 0.2rem;
+    color: #555;
+}
+
+.horario {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--azul);
+    background: #e6f2ff;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    text-align: right;
+}
+
+.status-tag {
+    display: inline-block;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    margin-top: 0.4rem;
+    background: #eee;
+}
+
+/* Abas (cadastros.html) */
+.tabs {
+    display: flex;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid #eee;
+}
+
+.tab {
+    padding: 0.8rem 1.5rem;
+    cursor: pointer;
+    font-weight: bold;
+    color: #555;
+    border-bottom: 3px solid transparent;
+}
+
+    .tab.active {
+        color: var(--azul);
+        border-bottom-color: var(--azul);
+    }
+
+.form-section {
+    display: none;
+}
+
+    .form-section.active {
+        display: block;
+    }

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Missões de Amor - Novo Agendamento</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <h1>Missões de Amor</h1>
+        <p>Agendar Consulta</p>
+    </header>
+    <nav>
+        <a href="index.html">Agenda Principal</a>
+        <a href="cadastros.html">Cadastros</a>
+        <a href="Agendar.html">Novo Agendamento</a>
+        <a href="painel.html">Painel TV</a>
+    </nav>
+    <div class="container" style="max-width: 650px;">
+        <h2>Criar Novo Agendamento</h2>
+        <br>
+        <form id="formAgendamento" onsubmit="agendar(event)">
+            <div class="form-group">
+                <label>Paciente</label>
+                <select id="selPaciente" required><option value="">Selecione o Paciente...</option></select>
+            </div>
+            <div class="form-group">
+                <label>Profissional</label>
+                <select id="selProfissional" required><option value="">Selecione o Profissional...</option></select>
+            </div>
+            <div class="form-group">
+                <label>Sala</label>
+                <select id="selSala" required><option value="">Selecione a Sala...</option></select>
+            </div>
+            <div class="row">
+                <div class="form-group"><label>Data</label><input type="date" id="dataConsulta" required></div>
+                <div class="form-group"><label>Hora Início</label><input type="time" id="horaInicio" required></div>
+                <div class="form-group"><label>Hora Fim</label><input type="time" id="horaFim" required></div>
+            </div>
+            <div class="form-group">
+                <label>Observações</label>
+                <textarea id="observacoes" rows="3" placeholder="Informações clínicas..."></textarea>
+            </div>
+            <button type="submit" class="btn-azul">Confirmar Agendamento</button>
+        </form>
+    </div>
+    <script src="js/agendar.js"></script>
+</body>
+</html>

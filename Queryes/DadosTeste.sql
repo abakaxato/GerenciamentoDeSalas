@@ -1,21 +1,32 @@
--- Garante que o SQL Server entenda o formato Ano-Mês-Dia independente do idioma do sistema
+USE [bd_gerenciamento]
+GO
+
 SET DATEFORMAT ymd;
 
--- ====================================================================
--- PASSO 1: LIMPEZA TOTAL DAS TABELAS (Ordem reversa de dependência)
--- ====================================================================
-DELETE FROM Agendamentos;
-DELETE FROM Pacientes;
-DELETE FROM Responsaveis;
-DELETE FROM Profissionais;
-DELETE FROM Salas;
+BEGIN TRANSACTION;
 
 -- ====================================================================
--- PASSO 2: INSERÇÃO DE RESPONSÁVEIS (Forçando IDs de 1 a 10)
+-- PASSO 1: LIMPEZA TOTAL DAS TABELAS (Respeitando a hierarquia das FKs)
 -- ====================================================================
-SET IDENTITY_INSERT Responsaveis ON;
+DELETE FROM [dbo].[Agendamentos];
+DELETE FROM [dbo].[Pacientes];
+DELETE FROM [dbo].[Responsaveis];
+DELETE FROM [dbo].[Profissionais];
+DELETE FROM [dbo].[Salas];
 
-INSERT INTO Responsaveis (Id, Nome, Telefone, Email) VALUES 
+-- Reseta os contadores de Identity para evitar lacunas caso seja necessário
+DBCC CHECKIDENT ('Responsaveis', RESEED, 0);
+DBCC CHECKIDENT ('Pacientes', RESEED, 0);
+DBCC CHECKIDENT ('Profissionais', RESEED, 0);
+DBCC CHECKIDENT ('Salas', RESEED, 0);
+DBCC CHECKIDENT ('Agendamentos', RESEED, 0);
+
+-- ====================================================================
+-- PASSO 2: INSERÇÃO DE RESPONSÁVEIS (IDs 1 a 10)
+-- ====================================================================
+SET IDENTITY_INSERT [dbo].[Responsaveis] ON;
+
+INSERT INTO [dbo].[Responsaveis] (Id, Nome, Telefone, Email) VALUES 
 (1, 'Carlos Augusto Silva', '(81) 99123-4567', 'carlos.augusto@email.com'),
 (2, 'Ana Beatriz Albuquerque', '(81) 98877-6655', 'ana.beatriz@email.com'),
 (3, 'Marcos Antônio Souza', '(81) 99765-4321', 'marcos.souza@email.com'),
@@ -27,14 +38,14 @@ INSERT INTO Responsaveis (Id, Nome, Telefone, Email) VALUES
 (9, 'Ricardo Alexandre Gomes', '(81) 99344-5566', 'ricardo.gomes@email.com'),
 (10, 'Letícia Oliveira Cruz', '(81) 98655-7788', 'leticia.cruz@email.com');
 
-SET IDENTITY_INSERT Responsaveis OFF;
+SET IDENTITY_INSERT [dbo].[Responsaveis] OFF;
 
 -- ====================================================================
--- PASSO 3: INSERÇÃO DE PACIENTES (Forçando IDs de 1 a 10)
+-- PASSO 3: INSERÇÃO DE PACIENTES (IDs 1 a 10)
 -- ====================================================================
-SET IDENTITY_INSERT Pacientes ON;
+SET IDENTITY_INSERT [dbo].[Pacientes] ON;
 
-INSERT INTO Pacientes (Id, ResponsavelId, Nome, DataNascimento) VALUES 
+INSERT INTO [dbo].[Pacientes] (Id, ResponsavelId, Nome, DataNascimento) VALUES 
 (1, 1, 'Pedro Henrique Silva', '2018-03-12'),
 (2, 1, 'Lucas Gabriel Silva', '2020-07-22'),
 (3, 2, 'Sofia Albuquerque Lima', '2015-11-05'),
@@ -46,14 +57,14 @@ INSERT INTO Pacientes (Id, ResponsavelId, Nome, DataNascimento) VALUES
 (9, 8, 'Guilherme Gomes Silva', '2019-12-08'),
 (10, 9, 'Valentina Cruz Albuquerque', '2022-02-15');
 
-SET IDENTITY_INSERT Pacientes OFF;
+SET IDENTITY_INSERT [dbo].[Pacientes] OFF;
 
 -- ====================================================================
--- PASSO 4: INSERÇÃO DE PROFISSIONAIS (Forçando IDs de 1 a 10)
+-- PASSO 4: INSERÇÃO DE PROFISSIONAIS (IDs 1 a 10)
 -- ====================================================================
-SET IDENTITY_INSERT Profissionais ON;
+SET IDENTITY_INSERT [dbo].[Profissionais] ON;
 
-INSERT INTO Profissionais (Id, Nome, Especialidade, Ativo) VALUES 
+INSERT INTO [dbo].[Profissionais] (Id, Nome, Especialidade, Ativo) VALUES 
 (1, 'Dr. André Rodrigues', 'Pediatria', 1),
 (2, 'Dra. Amanda Cavalcanti', 'Psicologia Infantil', 1),
 (3, 'Dr. Bruno César Melo', 'Fisioterapia Neurofuncional', 1),
@@ -65,14 +76,14 @@ INSERT INTO Profissionais (Id, Nome, Especialidade, Ativo) VALUES
 (9, 'Dr. Henrique Manso', 'Neuropediatria', 1),
 (10, 'Dra. Isabela Fontes', 'Psicologia Cognitivo-Comportamental', 0);
 
-SET IDENTITY_INSERT Profissionais OFF;
+SET IDENTITY_INSERT [dbo].[Profissionais] OFF;
 
 -- ====================================================================
--- PASSO 5: INSERÇÃO DE SALAS (Forçando IDs de 1 a 10)
+-- PASSO 5: INSERÇÃO DE SALAS (IDs 1 a 10)
 -- ====================================================================
-SET IDENTITY_INSERT Salas ON;
+SET IDENTITY_INSERT [dbo].[Salas] ON;
 
-INSERT INTO Salas (Id, Nome, Capacidade) VALUES 
+INSERT INTO [dbo].[Salas] (Id, Nome, Capacidade) VALUES 
 (1, 'Sala Azul - Integração Sensorial', 4),
 (2, 'Sala Verde - Atendimento Infantil', 2),
 (3, 'Sala Amarela - Fonoaudiologia', 2),
@@ -84,14 +95,14 @@ INSERT INTO Salas (Id, Nome, Capacidade) VALUES
 (9, 'Sala de Avaliação Diagnóstica', 2),
 (10, 'Auditório - Treinamentos/Grupos', 15);
 
-SET IDENTITY_INSERT Salas OFF;
+SET IDENTITY_INSERT [dbo].[Salas] OFF;
 
 -- ====================================================================
--- PASSO 6: INSERÇÃO DE AGENDAMENTOS (Forçando IDs de 1 a 10)
+-- PASSO 6: INSERÇÃO DE AGENDAMENTOS (IDs 1 a 10)
 -- ====================================================================
-SET IDENTITY_INSERT Agendamentos ON;
+SET IDENTITY_INSERT [dbo].[Agendamentos] ON;
 
-INSERT INTO Agendamentos (Id, PacienteId, ProfissionalId, SalaId, DataHoraInicio, DataHoraFim, Status, Observacoes) VALUES 
+INSERT INTO [dbo].[Agendamentos] (Id, PacienteId, ProfissionalId, SalaId, DataHoraInicio, DataHoraFim, Status, Observacoes) VALUES 
 (1, 1, 1, 1, '2026-06-15 08:00:00', '2026-06-15 09:00:00', 'Confirmado', 'Consulta mensal de acompanhamento de rotina.'),
 (2, 2, 2, 2, '2026-06-15 09:00:00', '2026-06-15 10:00:00', 'Confirmado', 'Sessão semanal de psicoterapia infantil.'),
 (3, 3, 4, 3, '2026-06-15 10:30:00', '2026-06-15 11:30:00', 'Agendado', 'Avaliação de processamento auditivo central.'),
@@ -103,4 +114,7 @@ INSERT INTO Agendamentos (Id, PacienteId, ProfissionalId, SalaId, DataHoraInicio
 (9, 9, 2, 2, '2026-06-18 10:00:00', '2026-06-18 11:00:00', 'Cancelado', 'Paciente informou indisponibilidade de transporte.'),
 (10, 1, 4, 3, '2026-06-18 14:00:00', '2026-06-18 15:00:00', 'Agendado', 'Sessão de fonoaudiologia continuada.');
 
-SET IDENTITY_INSERT Agendamentos OFF;
+SET IDENTITY_INSERT [dbo].[Agendamentos] OFF;
+
+COMMIT TRANSACTION;
+GO
