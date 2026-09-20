@@ -1,16 +1,29 @@
-using GerenciamentoSalas.API.Data;
+using GerenciamentoSalas.API.Models;
+using GerenciamentoSalas.API.Repositories;
+using GerenciamentoSalas.API.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+//Logging
+builder.Logging.ClearProviders();
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
+    .CreateLogger();
+builder.Host.UseSerilog();
+
+//Repositorys
+builder.Services.AddScoped<IAgendamentoRepository, AgendamentoRepository>();
+
+//Services
 builder.Services.AddControllers();
-builder.Services.AddDbContext<GerenciamentoContext>(opts => opts.UseSqlServer(builder.Configuration.GetConnectionString("ConexãoPadrão")));
+builder.Services.AddDbContext<GerenciamentoContext>(opts => opts.UseSqlServer(builder.Configuration.GetConnectionString("ConexaoPadrao")));
 
 var app = builder.Build();
 
-app.UseDefaultFiles(); // Procura automaticamente por index.html na raiz do wwwroot
-app.UseStaticFiles();  // Permite servir os arquivos estáticos (.html, .css, .js)
+app.UseDefaultFiles();
+app.UseStaticFiles();
 
 app.UseHttpsRedirection();
 

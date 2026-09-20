@@ -1,102 +1,101 @@
-﻿using System.Data;
-using Microsoft.Data.SqlClient;
+﻿using GerenciamentoSalas.API.DTOs;
 using GerenciamentoSalas.API.Models;
+using GerenciamentoSalas.API.Repositories.Interfaces;
 using GerenciamentoSalas.API.Requests;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 namespace GerenciamentoSalas.API.Repositories
 {
-    public class AgendamentoRepository
+    public class AgendamentoRepository : IAgendamentoRepository
     {
-        private readonly string _connectionString;
+        private readonly GerenciamentoContext _dbContext;
 
-        public AgendamentoRepository(IConfiguration configuration)
-        {
-            _connectionString = configuration.GetConnectionString("ConexaoPadrao")
-                ?? throw new ArgumentNullException("String de conexão não encontrada.");
+        private readonly ILogger<AgendamentoRepository> _logger;
+
+        public AgendamentoRepository(GerenciamentoContext context, ILogger<AgendamentoRepository> logger)
+        {   
+            _dbContext = context;
+            _logger = logger;
         }
 
-        public List<Agendamento> ObterTodosAgendamento()
+        public async Task<List<Agendamento>> ObterTodosAgendamentoAsync(CancellationToken cancellationToken = default)
         {
-            var lista = new List<Agendamento>();
+            List<Agendamento> agendamentos = await _dbContext.Agendamentos.ToListAsync(cancellationToken);
+            return agendamentos;
+        }
 
-            using (var conexao = new SqlConnection(_connectionString))
+        public async Task<int> InserirAgendamentoAsync(CriarAgendamentoRequest request,CancellationToken cancellationToken = default)
+        {
+            Agendamento agendamento = new()
             {
-                // Buscando a estrutura idêntica à que criamos no script de DROP/CREATE
-                string sql = "SELECT Id, PacienteId, ProfissionalId, SalaId, DataHoraInicio, DataHoraFim, Status, Observacoes FROM Agendamentos";
+                PacienteId = request.PacienteId,
+                ProfissionalId = request.ProfissionalId,
+                SalaId = request.SalaId,
+                DataHoraInicio = request.DataHoraInicio,
+                DataHoraFim = request.DataHoraFim,
+                Observacoes = request.Observacoes,
+                Status = request.Status
+            };
+            await _dbContext.Agendamentos.AddAsync(agendamento,cancellationToken);
 
-                using (var comando = new SqlCommand(sql, conexao))
+            await _dbContext.SaveChangesAsync(cancellationToken);
+            
+            return agendamento.Id;
+        }
+
+        public async Task<int> DeletarAgendamentoAsync(DeletarAgendamentoRequest request, CancellationToken cancellationToken = default) {
+            
+            using var transaction = await _dbContext.Database.BeginTransactionAsync(cancellationToken);
+            int IdDeletado = 0;
+            try
+            {
+                var ent = await _dbContext.Agendamentos
+                    .Where(ent =>
+                    ent.DataHoraInicio == request.DataHoraInicio &&
+                    ent.DataHoraFim == request.DataHoraFim &&
+                    ent.SalaId == request.SalaId
+                    ).ToListAsync(cancellationToken);
+
+                if (ent.Count == 0)
                 {
-                    conexao.Open();
-                    using (SqlDataReader reader = comando.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            var agendamento = new Agendamento
-                            {
-                                Id = Convert.ToInt32(reader["Id"]),
-                                PacienteId = Convert.ToInt32(reader["PacienteId"]),
-                                ProfissionalId = Convert.ToInt32(reader["ProfissionalId"]),
-                                SalaId = Convert.ToInt32(reader["SalaId"]),
-                                DataHoraInicio = Convert.ToDateTime(reader["DataHoraInicio"]),
-                                DataHoraFim = Convert.ToDateTime(reader["DataHoraFim"]),
-                                Status = reader["Status"].ToString() ?? "Confirmado",
-
-                                // Tratamento técnico do DBNull para o campo Observacoes que permite NULL
-                                Observacoes = reader["Observacoes"] != DBNull.Value
-                                    ? reader["Observacoes"].ToString()
-                                    : null
-                            };
-                            lista.Add(agendamento);
-                        }
-                    }
+                    _logger.LogError("A pesquisa pelo agendamento no banco não retornou nenhuma linha, deleção incompleta");
+                    throw new KeyNotFoundException("A pesquisa pelo agendamento no banco não retornou nenhuma linha, deleção incompleta");
                 }
+                else if (ent.Count == 1)
+                {
+                    _logger.LogInformation($"O registro no banco foi encontrado e vai ser deletado");
+                    
+                    IdDeletado = ent[0].Id;
+                    _dbContext.Agendamentos.Remove(ent[0]);
+                }
+
+                 int linhas = await _dbContext.SaveChangesAsync(cancellationToken);
+                
+                if(linhas == 1)
+                {
+                    _logger.LogInformation($"Agendamento com ID : {IdDeletado} removido com sucesso",IdDeletado);
+                    _logger.LogInformation($"O Agendamento de {request.DataHoraInicio} ate {request.DataHoraFim} na sala {request.SalaId} agora esta disponivel");
+
+                    await transaction.CommitAsync(cancellationToken);
+                    
+                    return IdDeletado;
+                }
+                else if (linhas == 0)
+                {
+                    throw new Exception("Não foi possivel deletar o agendamento no banco, deleção cancelada");
+                }
+                else 
+                {
+                    throw new InvalidOperationException($"essa deleção iria impactar {linhas} linhas no banco, deleção cancelada");
+                }
+            }catch (Exception ex)
+            {
+                await transaction.RollbackAsync(cancellationToken);
+                _logger.LogError(ex,$"Erro ao deletar agendamento ID{IdDeletado}");
+                throw;
             }
-            return lista;
-        }
-
-        public int InserirAgendamento(Agendamento agendamento)
-        {
-            using var conexao = new SqlConnection(_connectionString);
-            string sql = @"INSERT INTO Agendamentos (PacienteId, ProfissionalId, SalaId, DataHoraInicio, DataHoraFim, Observacoes, Status) 
-               OUTPUT INSERTED.Id
-               VALUES (@PacienteId, @ProfissionalId, @SalaId, @DataHoraInicio, @DataHoraFim, @Observacoes, @Status);";
-
-            using var comando = new SqlCommand(sql, conexao);
-            comando.Parameters.AddWithValue("@PacienteId", agendamento.PacienteId);
-            comando.Parameters.AddWithValue("@ProfissionalId", agendamento.ProfissionalId);
-            comando.Parameters.AddWithValue("@SalaId", agendamento.SalaId);
-            comando.Parameters.AddWithValue("@DataHoraInicio", agendamento.DataHoraInicio);
-            comando.Parameters.AddWithValue("@DataHoraFim", agendamento.DataHoraFim);
-            comando.Parameters.AddWithValue("@Observacoes", agendamento.Observacoes ?? (object)DBNull.Value);
-            comando.Parameters.AddWithValue("@Status", agendamento.Status ?? (object)DBNull.Value);
-
-            conexao.Open();
-            return Convert.ToInt32(comando.ExecuteScalar());
-        }
-
-        public int DeletarAgendamento( Agendamento agendamento) {
-            
-            using var conexao = new SqlConnection(_connectionString);
-            
-            string sql = @"delete Agendamentos
-                output deleted.id
-                from Agendamentos
-                inner join Salas on Agendamentos.SalaId = Salas.Id
-                where DataHoraInicio = @DataHoraInicio and DataHoraFim = @DataHoraFim and salas.Id = @SalaId";
-
-            using var comando = new SqlCommand(sql, conexao);
-
-            comando.Parameters.AddWithValue("@DataHoraInicio", agendamento.DataHoraInicio);
-            comando.Parameters.AddWithValue("@DataHoraFim", agendamento.DataHoraFim);
-            comando.Parameters.AddWithValue("@SalaId", agendamento.SalaId);
-
-            conexao.Open();
-
-            int idDeletado = Convert.ToInt32(comando.ExecuteScalar());
-
-            return idDeletado;
-
-
         }
     }
 }
