@@ -1,0 +1,7 @@
+﻿Vou deixar evidenciado alguns marcos que eu conseguir no processo de criação da solução:
+
+Criação da solução base em C#
+Criação/Modelagem do banco no SQL Server
+Criação da organização no azureDevops
+Criação de tasks em massa de atividades posteriores no azure DevOps
+Criação da possibilidade de enviar os pushs para 2 repositorios Azure/GitHub
