@@ -2,7 +2,7 @@
 Uma API REST robusta e escalável desenvolvida em .NET 8 para o gerenciamento de agendamentos, pacientes, responsáveis, profissionais de saúde e salas. O projeto foi desenhado seguindo boas práticas de arquitetura de software, garantindo performance e segurança na manipulação dos dados relacionais.
 
 🚀 Tecnologias Utilizadas
-Back-end: .NET 8 (C#) / ASP.NET Core Web API
+Back-end: .NET 8 (C#) / ASP.NET Core Web API 
 
 Banco de Dados: SQL Server (Transact-SQL)
 
