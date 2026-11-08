@@ -1,3 +1,5 @@
+(Preciso revisar esse Readme kkkkkk)
+
 📅 Sistema de Gerenciamento de Salas e Agendamentos Clínicos
 Uma API REST robusta e escalável desenvolvida em .NET 8 para o gerenciamento de agendamentos, pacientes, responsáveis, profissionais de saúde e salas. O projeto foi desenhado seguindo boas práticas de arquitetura de software, garantindo performance e segurança na manipulação dos dados relacionais.
 
