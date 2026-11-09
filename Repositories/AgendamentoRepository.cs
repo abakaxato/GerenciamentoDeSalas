@@ -20,86 +20,74 @@ namespace GerenciamentoSalas.API.Repositories
             _logger = logger;
         }
 
-        public async Task<List<Agendamento>> ObterTodosAgendamentoAsync(CancellationToken cancellationToken = default)
+        public async Task<Agendamento> ObterAgendamentoPorIDAsync(int id,CancellationToken cancellationToken = default)
         {
-            List<Agendamento> agendamentos = await _dbContext.Agendamentos.ToListAsync(cancellationToken);
-            return agendamentos;
-        }
-
-        public async Task<int> InserirAgendamentoAsync(CriarAgendamentoRequest request, CancellationToken cancellationToken = default)
-        {
-
-            //Posteriormente vou criar validações para verificar se alguma das entidades estão sendo utilizados naquele horario
-            Agendamento agendamento = new()
-            {
-                PacienteId = request.PacienteId,
-                ProfissionalId = request.ProfissionalId,
-                SalaId = request.SalaId,
-                DataHoraInicio = request.DataHoraInicio,
-                DataHoraFim = request.DataHoraFim,
-                Observacoes = request.Observacoes,
-                Status = request.Status
-            };
             try
             {
-                await _dbContext.Agendamentos.AddAsync(agendamento, cancellationToken);
-                await _dbContext.SaveChangesAsync(cancellationToken);
+                _logger.LogInformation($"Busca por agendamento {id} iniciada");
+                
+                Agendamento agendamento = await _dbContext.Agendamentos.
+                    Where(x => x.Id == id).FirstAsync(cancellationToken);
+
+                _logger.LogInformation($"Busca por agendamento {id} finalizada");
+                return agendamento;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Erro ao inserir agendamento");
+                _logger.LogError($"Ocorreu um erro ao tentar fazer a busca por agendamento com ID {id}. {ex.Message}");
                 throw;
             }
-            return agendamento.Id;
         }
-
-        public async Task<int> DeletarAgendamentoAsync(DeletarAgendamentoRequest request, CancellationToken cancellationToken = default)
+        public async Task<List<Agendamento>> ObterTodosAgendamentoAsync(CancellationToken cancellationToken = default)
         {
+            try
+            {
+                _logger.LogInformation($"Busca por todos os agendamentos iniciada");
+                List<Agendamento> agendamentos = await _dbContext.Agendamentos.ToListAsync(cancellationToken);
+                _logger.LogInformation($"Busca por todos os agendamentos finalizada");
+                return agendamentos;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Ocorreu um erro ao tentar fazer a busca por todos os agendamentos. {ex.Message}");
+                throw;
+            }
 
+        }
+        public async Task<int> DeletarAgendamentoAsync(Agendamento agendamento, CancellationToken cancellationToken = default)
+        {
             using var transaction = await _dbContext.Database.BeginTransactionAsync(cancellationToken);
             try
             {
-                Agendamento? agendamento = await _dbContext.Agendamentos
-                .SingleOrDefaultAsync(
-                x => x.Id == request.AgendamentoId,
-                cancellationToken);
-
-                if (agendamento is null)
-                {
-                    _logger.LogError("A pesquisa pelo agendamento no banco não retornou nenhuma linha, deleção incompleta");
-                    throw new KeyNotFoundException("Agendamento não encontrado.");
-                }
-                
-                _logger.LogInformation($"O registro no banco foi encontrado e vai ser deletado");
-
-                _dbContext.Agendamentos.Remove(agendamento);
-
-                int linhas = await _dbContext.SaveChangesAsync(cancellationToken);
-
-                if (linhas == 1)
-                {
-                    _logger.LogInformation($"Agendamento com ID {agendamento.Id} removido com sucesso");
-                    _logger.LogInformation($"O Agendamento de {agendamento.DataHoraInicio} ate {agendamento.DataHoraFim} agora esta disponivel Para sala {agendamento.SalaId}");
-
-                    await transaction.CommitAsync(cancellationToken);
-
-                    return agendamento.Id;
-                }
-                else if (linhas == 0)
-                {
-                    throw new Exception("Não foi possivel deletar o agendamento no banco, deleção cancelada");
-                }
-                else
-                {
-                    throw new InvalidOperationException($"essa deleção iria impactar {linhas} linhas no banco, deleção cancelada");
-                }
-            }
-            catch (Exception ex)
+                var idDeletado = _dbContext.Agendamentos.Remove(agendamento);
+                await _dbContext.SaveChangesAsync(cancellationToken);
+                _logger.LogInformation($"Agendamento deletado com sucesso. {agendamento}");
+                await transaction.CommitAsync(cancellationToken);
+                return agendamento.Id;
+            }catch(Exception ex)
             {
                 await transaction.RollbackAsync(cancellationToken);
-                _logger.LogError(ex, "Erro ao deletar agendamento");
+                _logger.LogError($"Ocorreu um erro ao tentar deletar o agendamento. {ex.Message}, {agendamento}");
                 throw;
             }
         }
+
+        public async Task<int> InserirAgendamentoAsync(Agendamento agendamento, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                var idGerado = await _dbContext.Agendamentos.AddAsync(agendamento);
+                _logger.LogInformation($"Agendamento inserido com sucesso. {agendamento}");
+                await _dbContext.SaveChangesAsync(cancellationToken);
+                return agendamento.Id;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Ocorreu um erro ao tentar inserir o agendamento. {ex.Message}, {agendamento}");
+                throw;
+            }
+        }
+
+        
     }
 }
