@@ -62,7 +62,7 @@ namespace GerenciamentoSalas.API.Repositories
             return Convert.ToInt32(resultado);
         }
 
-        public async Task<(int AgendamentosDeletado, List<int> IdsPacientesDeletados, int ResponsavelDeletado)> DeletarResponsavelAsync(DeletarResponsavelRequest request)
+        public async Task<(int AgendamentosDeletado, List<int> IdsPacientesDeletados, int ResponsavelDeletado)> DeletarResponsavelAsync(int id)
         {
             using var conexao = new SqlConnection(_connectionString);
             await conexao.OpenAsync();
@@ -81,7 +81,7 @@ namespace GerenciamentoSalas.API.Repositories
                 int agendamentosDeletados = 0;
                 using (var cmd = new SqlCommand(sqlAgend, conexao, transaction))
                 {
-                    cmd.Parameters.AddWithValue("@ResponsavelId", request.ResponsavelId);
+                    cmd.Parameters.AddWithValue("@ResponsavelId", id);
                     agendamentosDeletados = Convert.ToInt32(await cmd.ExecuteScalarAsync());
                 }
 
@@ -95,7 +95,7 @@ namespace GerenciamentoSalas.API.Repositories
                 var idsDeletados = new List<int>();
                 using (var cmd = new SqlCommand(sqlPacientes, conexao, transaction))
                 {
-                    cmd.Parameters.AddWithValue("@ResponsavelId", request.ResponsavelId);
+                    cmd.Parameters.AddWithValue("@ResponsavelId", id);
                     using var reader = await cmd.ExecuteReaderAsync();
                     while (await reader.ReadAsync())
                     {
@@ -108,7 +108,7 @@ namespace GerenciamentoSalas.API.Repositories
                 int responsavelDeletado = 0;
                 using (var cmd = new SqlCommand(sqlResponsavel, conexao, transaction))
                 {
-                    cmd.Parameters.AddWithValue("@ResponsavelId", request.ResponsavelId);
+                    cmd.Parameters.AddWithValue("@ResponsavelId", id);
                     responsavelDeletado = Convert.ToInt32(await cmd.ExecuteScalarAsync());
                 }
 

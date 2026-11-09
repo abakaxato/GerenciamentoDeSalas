@@ -66,7 +66,7 @@ namespace GerenciamentoSalas.API.Repositories
             }
         }
 
-        public async Task<(int AgendamentosDeletados, int IdPacienteDeletado)> DeletarPacienteAsync(DeletarPacienteRequest deletarPacienteRequest)
+        public async Task<(int AgendamentosDeletados, int IdPacienteDeletado)> DeletarPacienteAsync(int id)
         {
             using var conexao = new SqlConnection(_connectionString);
             await conexao.OpenAsync();
@@ -83,7 +83,7 @@ namespace GerenciamentoSalas.API.Repositories
                 int AgendamentosDeletados = 0;
                 using (var DelAgendamento = new SqlCommand(sql, conexao,transaction))
                 {
-                    DelAgendamento.Parameters.AddWithValue("@PacienteId", deletarPacienteRequest.PacienteId);
+                    DelAgendamento.Parameters.AddWithValue("@PacienteId", id);
 
                     AgendamentosDeletados = Convert.ToInt32(await DelAgendamento.ExecuteScalarAsync());
                 }
@@ -97,7 +97,7 @@ namespace GerenciamentoSalas.API.Repositories
                 int idDeletado = 0;
                 using (var delPaciente = new SqlCommand(sql2, conexao,transaction))
                 {
-                    delPaciente.Parameters.AddWithValue("@PacienteId", deletarPacienteRequest.PacienteId);
+                    delPaciente.Parameters.AddWithValue("@PacienteId", id);
 
                     idDeletado = Convert.ToInt32(await delPaciente.ExecuteScalarAsync());
                 }

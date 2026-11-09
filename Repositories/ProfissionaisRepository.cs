@@ -62,7 +62,7 @@ namespace GerenciamentoSalas.API.Repositories
             return Convert.ToInt32(comando.ExecuteScalar());
         }
 
-        public async Task<(List<int> IdAgendamentosDeletados, int IdResponsavelDeletado)> DeletarProfissionaisAsync(DeletarProfissionalRequest request) {
+        public async Task<(List<int> IdAgendamentosDeletados, int IdResponsavelDeletado)> DeletarProfissionaisAsync(int id) {
 
             using var conexao = new SqlConnection(_connectionString);
             await conexao.OpenAsync();
@@ -80,7 +80,7 @@ namespace GerenciamentoSalas.API.Repositories
 
                 using (var cmd = new SqlCommand(sqlAgendamento, conexao, transaction))
                 {
-                    cmd.Parameters.AddWithValue("@IdProfissional", request.Id);
+                    cmd.Parameters.AddWithValue("@IdProfissional", id);
 
                     using var reader = await cmd.ExecuteReaderAsync();
 
@@ -100,7 +100,7 @@ namespace GerenciamentoSalas.API.Repositories
                 int idDeletadoProfissionais = 0;
                 using (var cmd = new SqlCommand(sqlProfissionais, conexao, transaction))
                 {
-                    cmd.Parameters.AddWithValue("@IdProfissional", request.Id);
+                    cmd.Parameters.AddWithValue("@IdProfissional", id);
                     idDeletadoProfissionais = Convert.ToInt32(await cmd.ExecuteScalarAsync());
                 }
                 transaction.Commit();
