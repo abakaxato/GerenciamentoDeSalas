@@ -17,7 +17,7 @@ namespace GerenciamentoSalas.API.Controllers
         }
 
         [HttpGet]
-        [Route("api/[controller]/{id}")]
+        [Route("{id}")]
         public async Task<IActionResult> ObterAgendamentoPorIDAsync([FromRoute]int id, CancellationToken cancellationToken = default)
         {
                 Agendamento? agendamento = await _agendamentoService.ObterAgendamentoPorIDAsync(id,cancellationToken);
@@ -52,11 +52,12 @@ namespace GerenciamentoSalas.API.Controllers
         }
 
         [HttpDelete]
-        public async Task<IActionResult> DeletarAgendamentoAsync([FromBody]DeletarAgendamentoRequest request, CancellationToken cancellationToken = default) {
+        [Route("{id}")]
+        public async Task<IActionResult> DeletarAgendamentoAsync([FromRoute]int id, CancellationToken cancellationToken = default) {
 
             try
             {
-                int idDeletado = await _agendamentoService.DeletarAgendamentoAsync(request, cancellationToken);
+                int idDeletado = await _agendamentoService.DeletarAgendamentoAsync(id, cancellationToken);
 
                 return StatusCode(200, $"O Agendamento com o ID {idDeletado} foi deletado com sucesso");
             }

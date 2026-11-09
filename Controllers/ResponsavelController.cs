@@ -65,17 +65,17 @@ namespace GerenciamentoSalas.API.Controllers
         {
             try
             {
-                var request = new DeletarResponsavelRequest { ResponsavelId = id };
-                var (agendamentosDeletados, idsPacientesDeletados, responsavelDeletado) =
-                    await _ResponsavelRepository.DeletarResponsavelAsync(request);
+                /* var (agendamentosDeletados, idsPacientesDeletados, responsavelDeletado) =
+                     await _ResponsavelRepository.DeletarResponsavelAsync(request);
 
-                return Ok(new
-                {
-                    AgendamentosDeletados = agendamentosDeletados,
-                    PacientesDeletados = idsPacientesDeletados.Count,
-                    IdsPacientesDeletados = idsPacientesDeletados,
-                    ResponsavelDeletado = responsavelDeletado
-                });
+                 return Ok(new
+                 {
+                     AgendamentosDeletados = agendamentosDeletados,
+                     PacientesDeletados = idsPacientesDeletados.Count,
+                     IdsPacientesDeletados = idsPacientesDeletados,
+                     ResponsavelDeletado = responsavelDeletado
+                 });*/
+                return Ok();
             }
             catch (Exception ex)
             {
