@@ -47,14 +47,13 @@ namespace GerenciamentoSalas.API.Repositories
         public int InserirSala(Sala sala)
         {
             using var conexao = new SqlConnection(_connectionString);
-            string sql = @"INSERT INTO Salas (Nome, Capacidade, Ativa) 
+            string sql = @"INSERT INTO Salas (Nome, Capacidade) 
                    OUTPUT INSERTED.Id
-                   VALUES (@Nome, @Capacidade, @Ativa);";
+                   VALUES (@Nome, @Capacidade);";
 
             using var comando = new SqlCommand(sql, conexao);
             comando.Parameters.AddWithValue("@Nome", sala.Nome);
             comando.Parameters.AddWithValue("@Capacidade", sala.Capacidade);
-            comando.Parameters.AddWithValue("@Ativa", sala.Ativa);
 
             conexao.Open();
             return Convert.ToInt32(comando.ExecuteScalar());

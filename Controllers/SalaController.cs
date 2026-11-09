@@ -44,7 +44,6 @@ namespace GerenciamentoSalas.API.Controllers
                 {
                     Nome = input.Nome,
                     Capacidade = input.Capacidade,
-                    Ativa = input.Ativa
                 };
 
                 int idGerado = _SalaRepository.InserirSala(sala);
