@@ -18,35 +18,21 @@ namespace GerenciamentoSalas.API.Controllers
 
         [HttpGet]
         [Route("api/[controller]/{id}")]
-        public async Task<IActionResult> ObterAgendamentoPorID([FromRoute]int id, CancellationToken cancellationToken = default)
+        public async Task<IActionResult> ObterAgendamentoPorIDAsync([FromRoute]int id, CancellationToken cancellationToken = default)
         {
-            try
-            {
                 Agendamento? agendamento = await _agendamentoService.ObterAgendamentoPorIDAsync(id,cancellationToken);
                 return Ok(agendamento);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Erro interno no servidor ao buscar agendamento com ID {id}: {ex.Message}");
-            }
         }
 
         [HttpGet]
-        public async Task<IActionResult> ObterAgendamentos(CancellationToken cancellationToken = default)
+        public async Task<IActionResult> ObterTodosAgendamentoAsync(CancellationToken cancellationToken = default)
         {
-            try
-            {
                 List<Agendamento> agendamentos = await _agendamentoService.ObterTodosAgendamentoAsync(cancellationToken);
                 return Ok(agendamentos);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Erro interno no servidor ao buscar agendamentos: {ex.Message}");
-            }
         }
 
         [HttpPost]
-        public async Task<IActionResult> Inserir([FromBody] CriarAgendamentoRequest criarAgendamentoRequest, CancellationToken cancellationToken = default)
+        public async Task<IActionResult> InserirAgendamentoAsync([FromBody] CriarAgendamentoRequest criarAgendamentoRequest, CancellationToken cancellationToken = default)
         {
             try
             {
@@ -66,7 +52,7 @@ namespace GerenciamentoSalas.API.Controllers
         }
 
         [HttpDelete]
-        public async Task<IActionResult> Deletar([FromBody]DeletarAgendamentoRequest request, CancellationToken cancellationToken = default) {
+        public async Task<IActionResult> DeletarAgendamentoAsync([FromBody]DeletarAgendamentoRequest request, CancellationToken cancellationToken = default) {
 
             try
             {

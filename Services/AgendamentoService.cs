@@ -70,7 +70,7 @@ namespace GerenciamentoSalas.API.Services
         {
             try
             {
-                Agendamento agendamento = await _agendamentoRepository.ObterAgendamentoPorIDAsync(request.AgendamentoId, cancellationToken);
+                Agendamento? agendamento = await _agendamentoRepository.ObterAgendamentoPorIDAsync(request.AgendamentoId, cancellationToken);
                 if (agendamento is null)
                 {
                     _logger.LogError("A pesquisa pelo agendamento no banco não retornou nenhuma linha, deleção incompleta");
