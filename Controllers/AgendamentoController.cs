@@ -17,11 +17,12 @@ namespace GerenciamentoSalas.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> ObterAgendamentoPorID([FromBody]int id, CancellationToken cancellationToken = default)
+        [Route("api/[controller]/{id}")]
+        public async Task<IActionResult> ObterAgendamentoPorID([FromRoute]int id, CancellationToken cancellationToken = default)
         {
             try
             {
-                Agendamento agendamento = await _agendamentoService.ObterAgendamentoPorIDAsync(id,cancellationToken);
+                Agendamento? agendamento = await _agendamentoService.ObterAgendamentoPorIDAsync(id,cancellationToken);
                 return Ok(agendamento);
             }
             catch (Exception ex)
@@ -45,22 +46,12 @@ namespace GerenciamentoSalas.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Inserir([FromBody] CriarAgendamentoRequest input, CancellationToken cancellationToken = default)
+        public async Task<IActionResult> Inserir([FromBody] CriarAgendamentoRequest criarAgendamentoRequest, CancellationToken cancellationToken = default)
         {
             try
             {
-                var agendamento = new CriarAgendamentoRequest
-                {
-                    PacienteId = input.PacienteId,
-                    ProfissionalId = input.ProfissionalId,
-                    SalaId = input.SalaId,
-                    DataHoraInicio = input.DataHoraInicio,
-                    DataHoraFim = input.DataHoraFim,
-                    Observacoes = input.Observacoes,
-                    Status = input.Status
-                };
 
-                int idGerado = await  _agendamentoService.InserirAgendamentoAsync(agendamento, cancellationToken);
+                int idGerado = await  _agendamentoService.InserirAgendamentoAsync(criarAgendamentoRequest, cancellationToken);
 
                 return StatusCode(201, new
                 {

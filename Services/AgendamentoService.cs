@@ -1,10 +1,8 @@
 ﻿using GerenciamentoSalas.API.DTOs;
 using GerenciamentoSalas.API.Models;
-using GerenciamentoSalas.API.Repositories;
 using GerenciamentoSalas.API.Repositories.Interfaces;
 using GerenciamentoSalas.API.Requests;
 using GerenciamentoSalas.API.Services.Interfaces;
-using Microsoft.EntityFrameworkCore;
 
 namespace GerenciamentoSalas.API.Services
 {
@@ -19,9 +17,9 @@ namespace GerenciamentoSalas.API.Services
             _logger = logger;
         }
 
-        public async Task<Agendamento> ObterAgendamentoPorIDAsync(int id, CancellationToken cancellationToken = default)
+        public async Task<Agendamento?> ObterAgendamentoPorIDAsync(int id, CancellationToken cancellationToken = default)
         {
-            Agendamento agendamento = await _agendamentoRepository.ObterAgendamentoPorIDAsync(id, cancellationToken);
+            Agendamento? agendamento = await _agendamentoRepository.ObterAgendamentoPorIDAsync(id, cancellationToken);
             return agendamento;
         }
 

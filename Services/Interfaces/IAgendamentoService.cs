@@ -6,7 +6,7 @@ namespace GerenciamentoSalas.API.Services.Interfaces
 {
     public interface IAgendamentoService
     {
-        public Task<Agendamento> ObterAgendamentoPorIDAsync(int id, CancellationToken cancellationToken = default);
+        public Task<Agendamento?> ObterAgendamentoPorIDAsync(int id, CancellationToken cancellationToken = default);
         public Task<List<Agendamento>> ObterTodosAgendamentoAsync(CancellationToken cancellationToken = default);
 
         public Task<int> InserirAgendamentoAsync(CriarAgendamentoRequest agendamentoRequest, CancellationToken cancellationToken = default);
