@@ -26,4 +26,9 @@ public partial class Agendamento
     public virtual Profissionai Profissional { get; set; } = null!;
 
     public virtual Sala Sala { get; set; } = null!;
+
+    public override string ToString()
+    {
+        return $"Sala : {SalaId}, inicio : {DataHoraInicio}, Fim : {DataHoraFim}, Paciente : {PacienteId}";
+    }
 }
