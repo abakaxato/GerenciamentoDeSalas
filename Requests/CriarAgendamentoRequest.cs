@@ -8,6 +8,6 @@
         public DateTime DataHoraInicio { get; set; }
         public DateTime DataHoraFim { get; set; }
         public string? Observacoes { get; set; }
-        public string? Status { get; set; } = string.Empty;
+        public string? Status { get; set; } = "Confirmado";
     }
 }
