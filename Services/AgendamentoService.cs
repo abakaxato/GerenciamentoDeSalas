@@ -66,11 +66,11 @@ namespace GerenciamentoSalas.API.Services
             return agendamento.Id;
         }
 
-        public async Task<int> DeletarAgendamentoAsync(DeletarAgendamentoRequest request, CancellationToken cancellationToken = default)
+        public async Task<int> DeletarAgendamentoAsync(int id, CancellationToken cancellationToken = default)
         {
             try
             {
-                Agendamento? agendamento = await _agendamentoRepository.ObterAgendamentoPorIDAsync(request.AgendamentoId, cancellationToken);
+                Agendamento? agendamento = await _agendamentoRepository.ObterAgendamentoPorIDAsync(id, cancellationToken);
                 if (agendamento is null)
                 {
                     _logger.LogError("A pesquisa pelo agendamento no banco não retornou nenhuma linha, deleção incompleta");

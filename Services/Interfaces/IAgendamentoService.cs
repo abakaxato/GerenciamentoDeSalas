@@ -11,6 +11,6 @@ namespace GerenciamentoSalas.API.Services.Interfaces
 
         public Task<int> InserirAgendamentoAsync(CriarAgendamentoRequest agendamentoRequest, CancellationToken cancellationToken = default);
 
-        public Task<int> DeletarAgendamentoAsync(DeletarAgendamentoRequest request, CancellationToken cancellationToken = default);
+        public Task<int> DeletarAgendamentoAsync(int id, CancellationToken cancellationToken = default);
     }
 }
