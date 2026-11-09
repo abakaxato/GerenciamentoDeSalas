@@ -19,7 +19,7 @@ public partial class GerenciamentoContext : DbContext
 
     public virtual DbSet<Paciente> Pacientes { get; set; }
 
-    public virtual DbSet<Profissionai> Profissionais { get; set; }
+    public virtual DbSet<Profissional> Profissionais { get; set; }
 
     public virtual DbSet<Responsavei> Responsaveis { get; set; }
 
@@ -72,7 +72,7 @@ public partial class GerenciamentoContext : DbContext
                 .HasConstraintName("FK_Pacientes_Responsaveis");
         });
 
-        modelBuilder.Entity<Profissionai>(entity =>
+        modelBuilder.Entity<Profissional>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__Profissi__3214EC07333F1594");
 

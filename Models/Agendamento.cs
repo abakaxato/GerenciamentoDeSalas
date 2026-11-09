@@ -23,7 +23,7 @@ public partial class Agendamento
 
     public virtual Paciente Paciente { get; set; } = null!;
 
-    public virtual Profissionai Profissional { get; set; } = null!;
+    public virtual Profissional Profissional { get; set; } = null!;
 
     public virtual Sala Sala { get; set; } = null!;
 

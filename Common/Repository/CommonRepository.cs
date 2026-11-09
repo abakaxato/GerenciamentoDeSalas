@@ -9,7 +9,7 @@ namespace GerenciamentoSalas.API.Common.Repositorie
     {
         private readonly ILogger<CommonRepository> _logger;
         private readonly GerenciamentoContext _dbContext;
-        public CommonRepository(ILogger<CommonRepository> logger, GerenciamentoContext dbContext = null)
+        public CommonRepository(ILogger<CommonRepository> logger, GerenciamentoContext dbContext)
         {
             _logger = logger;
             _dbContext = dbContext;
