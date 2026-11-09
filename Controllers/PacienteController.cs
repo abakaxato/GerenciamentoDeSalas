@@ -1,6 +1,7 @@
 ﻿using GerenciamentoSalas.API.Models;
 using GerenciamentoSalas.API.Repositories;
 using GerenciamentoSalas.API.Requests;
+using GerenciamentoSalas.API.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GerenciamentoSalas.API.Controllers
@@ -10,9 +11,25 @@ namespace GerenciamentoSalas.API.Controllers
     public class PacienteController : ControllerBase
     {
         private readonly PacienteRepository _PacienteRepository;
+        private readonly IPacienteService _PacienteService;
 
-        public PacienteController(IConfiguration configuration) {
+        public PacienteController(IConfiguration configuration, IPacienteService pacienteService) {
             _PacienteRepository = new PacienteRepository(configuration);
+            _PacienteService = pacienteService;
+        }
+
+        [HttpGet]
+        [Route("VerificarDisponibilidade")]
+        public async Task<IActionResult> VerificarDisponibilidade([FromQuery]int id, [FromQuery] DateTime dataInicio,DateTime dataFim)
+        {
+            try
+            {
+                bool disponibilidade = await _PacienteService.VerificarDisponibilidadeAsync(id, dataInicio, dataFim);
+                return Ok(disponibilidade);
+            }
+            catch(Exception ex) {
+                return StatusCode(500, $"Erro Interno no servidor{ex.Message}");
+            }
         }
 
         [HttpGet]

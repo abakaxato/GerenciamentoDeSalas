@@ -13,7 +13,7 @@ namespace GerenciamentoSalas.API.Common.Service
             _commonRepository = commonRepository;
         }
         public async  Task<bool> VerificarDisponibilidade<T>(T entidade, DateTime DataInicio, DateTime DataFim, CancellationToken cancellationToken = default) {
-            bool disponivel = await _commonRepository.VerificarDisponibilidade(entidade, DataInicio, DataFim, cancellationToken);
+            bool disponivel = await _commonRepository.VerificarDisponibilidadeAsync(entidade, DataInicio, DataFim, cancellationToken);
             return disponivel;
         }
     }

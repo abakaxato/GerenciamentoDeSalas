@@ -14,37 +14,34 @@ namespace GerenciamentoSalas.API.Common.Repositorie
             _logger = logger;
             _dbContext = dbContext;
         }
-        public async Task<bool> VerificarDisponibilidade<T>(T entidade, DateTime DataInicio, DateTime DataFim, CancellationToken cancellationToken = default)
+        public async Task<bool> VerificarDisponibilidadeAsync<T>(T entidade, DateTime DataInicio, DateTime DataFim, CancellationToken cancellationToken = default)
         {
             
             try
             {
-                bool disponivel = false;
+                bool disponivel = true;
                 switch (entidade)
                 {
                     case (Paciente paciente):
                         List<Agendamento> registrosPaciente = await _dbContext.Agendamentos.
                             Where(x => x.PacienteId == paciente.Id)
-                            .Where(y => y.DataHoraInicio <= DataInicio)
-                            .Where(z => z.DataHoraFim >= DataFim)
+                            .Where(x => x.DataHoraInicio < DataFim && x.DataHoraFim > DataInicio)
                             .ToListAsync(cancellationToken);
-                        if (registrosPaciente.IsNullOrEmpty()) { disponivel = true; }
+                        if (!registrosPaciente.IsNullOrEmpty()) { disponivel = false; }
                         break;
-                    case (Sala Sala):
+                    case (Sala sala):
                         List<Agendamento> registrosSala = await _dbContext.Agendamentos.
-                            Where(x => x.PacienteId == Sala.Id)
-                            .Where(y => y.DataHoraInicio <= DataInicio)
-                            .Where(z => z.DataHoraFim >= DataFim)
+                            Where(x => x.SalaId == sala.Id)
+                            .Where(x => x.DataHoraInicio < DataFim && x.DataHoraFim > DataInicio)
                             .ToListAsync(cancellationToken);
-                        if (registrosSala.IsNullOrEmpty()) { disponivel = true; }
+                        if (!registrosSala.IsNullOrEmpty()) { disponivel = false; }
                         break;
                     case (Profissional profissional):
                         List<Agendamento> registrosProfissional = await _dbContext.Agendamentos.
-                            Where(x => x.PacienteId == profissional.Id)
-                            .Where(y => y.DataHoraInicio <= DataInicio)
-                            .Where(z => z.DataHoraFim >= DataFim)
+                            Where(x => x.ProfissionalId == profissional.Id)
+                            .Where(x => x.DataHoraInicio < DataFim && x.DataHoraFim > DataInicio)
                             .ToListAsync(cancellationToken);
-                        if (registrosProfissional.IsNullOrEmpty()) { disponivel = true; }
+                        if (!registrosProfissional.IsNullOrEmpty()) { disponivel = false; }
                         break;
                     default:
                         _logger.LogError("Entidade não reconhecida para verificar disponibilidade");

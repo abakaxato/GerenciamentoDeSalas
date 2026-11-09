@@ -1,3 +1,7 @@
+using GerenciamentoSalas.API.Common.Repositorie;
+using GerenciamentoSalas.API.Common.Repositorie.interfaces;
+using GerenciamentoSalas.API.Common.Service;
+using GerenciamentoSalas.API.Common.Service.Interface;
 using GerenciamentoSalas.API.Models;
 using GerenciamentoSalas.API.Repositories;
 using GerenciamentoSalas.API.Repositories.Interfaces;
@@ -20,6 +24,9 @@ builder.Host.UseSerilog();
 builder.Services.AddOpenApi();
 builder.Services.AddScoped<IAgendamentoService,AgendamentoService>();
 builder.Services.AddScoped<IAgendamentoRepository, AgendamentoRepository>();
+builder.Services.AddScoped<IPacienteService, PacienteService>();
+builder.Services.AddScoped<ICommonService, CommonService>();
+builder.Services.AddScoped<CommonRepository>();
 builder.Services.AddControllers();
 builder.Services.AddDbContext<GerenciamentoContext>(opts => opts.UseSqlServer(builder.Configuration.GetConnectionString("ConexaoPadrao")));
 
