@@ -3,6 +3,7 @@ using GerenciamentoSalas.API.Models;
 using GerenciamentoSalas.API.Repositories;
 using GerenciamentoSalas.API.Repositories.Interfaces;
 using GerenciamentoSalas.API.Requests;
+using GerenciamentoSalas.API.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GerenciamentoSalas.API.Controllers
@@ -11,18 +12,32 @@ namespace GerenciamentoSalas.API.Controllers
     [Route("api/[controller]")]
     public class AgendamentoController : ControllerBase
     {
-        private readonly IAgendamentoRepository _agendamentoRepository;
-        public AgendamentoController (IAgendamentoRepository agendamentoRepository)
+        private readonly IAgendamentoService _agendamentoService;
+        public AgendamentoController (IAgendamentoService agendamentoService)
         {
-            _agendamentoRepository = agendamentoRepository;
+            _agendamentoService = agendamentoService;
         }
 
         [HttpGet]
-        public async Task<IActionResult> ObterTodos()
+        public async Task<IActionResult> ObterAgendamentoPorID([FromBody]int id)
         {
             try
             {
-                List<Agendamento> agendamentos = await _agendamentoRepository.ObterTodosAgendamentoAsync();
+                Agendamento agendamento = await _agendamentoService.ObterAgendamentoPorIDAsync(id);
+                return Ok(agendamento);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Erro interno no servidor ao buscar agendamento com ID {id}: {ex.Message}");
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ObterAgendamentos()
+        {
+            try
+            {
+                List<Agendamento> agendamentos = await _agendamentoService.ObterTodosAgendamentoAsync();
                 return Ok(agendamentos);
             }
             catch (Exception ex)
@@ -36,14 +51,6 @@ namespace GerenciamentoSalas.API.Controllers
         {
             try
             {
-                if (input == null) return BadRequest("Dados inválidos.");
-
-                if (input.DataHoraFim <= input.DataHoraInicio)
-                {
-                    return BadRequest(
-                        "A data de término deve ser maior que a data de início.");
-                }
-
                 var agendamento = new CriarAgendamentoRequest
                 {
                     PacienteId = input.PacienteId,
@@ -55,7 +62,7 @@ namespace GerenciamentoSalas.API.Controllers
                     Status = input.Status
                 };
 
-                int idGerado = await  _agendamentoRepository.InserirAgendamentoAsync(agendamento);
+                int idGerado = await  _agendamentoService.InserirAgendamentoAsync(agendamento);
 
                 return StatusCode(201, new
                 {
@@ -74,11 +81,7 @@ namespace GerenciamentoSalas.API.Controllers
 
             try
             {
-                if (request is null || request.AgendamentoId <= 0) 
-                {
-                    return BadRequest("AgendamentoId inválido.");
-                }
-                int idDeletado = await _agendamentoRepository.DeletarAgendamentoAsync(request);
+                int idDeletado = await _agendamentoService.DeletarAgendamentoAsync(request);
 
                 return StatusCode(200, $"O Agendamento com o ID {idDeletado} foi deletado com sucesso");
             }

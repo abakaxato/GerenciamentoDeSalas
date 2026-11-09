@@ -33,7 +33,17 @@ namespace GerenciamentoSalas.API.Services
 
         public async Task<int> InserirAgendamentoAsync(CriarAgendamentoRequest request, CancellationToken cancellationToken = default)
         {
+            if (request == null)
+            {
+                _logger.LogError("Erro ao inserir agendamento, requsição vazia");
+                throw new ArgumentNullException($"{request}");
+            }
 
+            if (request.DataHoraFim <= request.DataHoraInicio)
+            {
+                _logger.LogError("Erro ao inserir agendamento, a data de término deve ser maior que a data de início.");
+                throw new InvalidOperationException("Erro ao inserir agendamento, a data de término deve ser maior que a data de início.");
+            }
             //Posteriormente vou criar validações para verificar se alguma das entidades estão sendo utilizados naquele horario
             Agendamento agendamento = new()
             {
