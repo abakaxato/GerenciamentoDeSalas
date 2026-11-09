@@ -1,6 +1,8 @@
 using GerenciamentoSalas.API.Models;
 using GerenciamentoSalas.API.Repositories;
 using GerenciamentoSalas.API.Repositories.Interfaces;
+using GerenciamentoSalas.API.Services;
+using GerenciamentoSalas.API.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 
@@ -17,7 +19,12 @@ builder.Host.UseSerilog();
 builder.Services.AddScoped<IAgendamentoRepository, AgendamentoRepository>();
 
 //Services
+builder.Services.AddScoped<IAgendamentoService,AgendamentoService>();
+
+//Controllers
 builder.Services.AddControllers();
+
+//Contexts
 builder.Services.AddDbContext<GerenciamentoContext>(opts => opts.UseSqlServer(builder.Configuration.GetConnectionString("ConexaoPadrao")));
 
 var app = builder.Build();
