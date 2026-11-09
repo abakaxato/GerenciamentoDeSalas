@@ -4,6 +4,7 @@ using GerenciamentoSalas.API.Repositories.Interfaces;
 using GerenciamentoSalas.API.Services;
 using GerenciamentoSalas.API.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Scalar.AspNetCore;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,20 +16,27 @@ Log.Logger = new LoggerConfiguration()
     .CreateLogger();
 builder.Host.UseSerilog();
 
-//Repositorys
-builder.Services.AddScoped<IAgendamentoRepository, AgendamentoRepository>();
-
 //Services
+builder.Services.AddOpenApi();
 builder.Services.AddScoped<IAgendamentoService,AgendamentoService>();
-
-//Controllers
+builder.Services.AddScoped<IAgendamentoRepository, AgendamentoRepository>();
 builder.Services.AddControllers();
-
-//Contexts
 builder.Services.AddDbContext<GerenciamentoContext>(opts => opts.UseSqlServer(builder.Configuration.GetConnectionString("ConexaoPadrao")));
 
 var app = builder.Build();
 
+//Scallar
+if (app.Environment.IsDevelopment())
+{
+    app.MapOpenApi();
+
+    app.MapScalarApiReference(options =>
+    {
+        options
+            .WithTitle("Gerenciamento Salas API")
+            .WithTheme(ScalarTheme.Kepler);
+    });
+}
 app.UseDefaultFiles();
 app.UseStaticFiles();
 
