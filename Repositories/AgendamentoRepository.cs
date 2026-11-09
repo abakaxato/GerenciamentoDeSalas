@@ -76,7 +76,7 @@ namespace GerenciamentoSalas.API.Repositories
         {
             try
             {
-                var idGerado = await _dbContext.Agendamentos.AddAsync(agendamento);
+                var idGerado = await _dbContext.Agendamentos.AddAsync(agendamento,cancellationToken);
                 _logger.LogInformation($"Agendamento inserido com sucesso. {agendamento}");
                 await _dbContext.SaveChangesAsync(cancellationToken);
                 return agendamento.Id;

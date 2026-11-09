@@ -21,13 +21,13 @@ namespace GerenciamentoSalas.API.Services
 
         public async Task<Agendamento> ObterAgendamentoPorIDAsync(int id, CancellationToken cancellationToken = default)
         {
-            Agendamento agendamento = await _agendamentoRepository.ObterAgendamentoPorIDAsync(id);
+            Agendamento agendamento = await _agendamentoRepository.ObterAgendamentoPorIDAsync(id, cancellationToken);
             return agendamento;
         }
 
         public async Task<List<Agendamento>> ObterTodosAgendamentoAsync(CancellationToken cancellationToken = default)
         {
-            List<Agendamento> agendamentos = await _agendamentoRepository.ObterTodosAgendamentoAsync();
+            List<Agendamento> agendamentos = await _agendamentoRepository.ObterTodosAgendamentoAsync(cancellationToken);
             return agendamentos;
         }
 
@@ -58,7 +58,7 @@ namespace GerenciamentoSalas.API.Services
 
             try
             {
-                await _agendamentoRepository.InserirAgendamentoAsync(agendamento);
+                await _agendamentoRepository.InserirAgendamentoAsync(agendamento,cancellationToken);
             }
             catch (Exception ex)
             {
@@ -81,7 +81,7 @@ namespace GerenciamentoSalas.API.Services
 
                 _logger.LogInformation($"O registro no banco foi encontrado e vai ser deletado");
 
-                await _agendamentoRepository.DeletarAgendamentoAsync(agendamento);
+                await _agendamentoRepository.DeletarAgendamentoAsync(agendamento,cancellationToken);
 
                 _logger.LogInformation($"Agendamento com ID {agendamento.Id} removido com sucesso");
                 return agendamento.Id;

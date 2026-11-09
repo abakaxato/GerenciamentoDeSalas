@@ -1,7 +1,5 @@
 ﻿using GerenciamentoSalas.API.DTOs;
 using GerenciamentoSalas.API.Models;
-using GerenciamentoSalas.API.Repositories;
-using GerenciamentoSalas.API.Repositories.Interfaces;
 using GerenciamentoSalas.API.Requests;
 using GerenciamentoSalas.API.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -19,11 +17,11 @@ namespace GerenciamentoSalas.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> ObterAgendamentoPorID([FromBody]int id)
+        public async Task<IActionResult> ObterAgendamentoPorID([FromBody]int id, CancellationToken cancellationToken = default)
         {
             try
             {
-                Agendamento agendamento = await _agendamentoService.ObterAgendamentoPorIDAsync(id);
+                Agendamento agendamento = await _agendamentoService.ObterAgendamentoPorIDAsync(id,cancellationToken);
                 return Ok(agendamento);
             }
             catch (Exception ex)
@@ -33,11 +31,11 @@ namespace GerenciamentoSalas.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> ObterAgendamentos()
+        public async Task<IActionResult> ObterAgendamentos(CancellationToken cancellationToken = default)
         {
             try
             {
-                List<Agendamento> agendamentos = await _agendamentoService.ObterTodosAgendamentoAsync();
+                List<Agendamento> agendamentos = await _agendamentoService.ObterTodosAgendamentoAsync(cancellationToken);
                 return Ok(agendamentos);
             }
             catch (Exception ex)
@@ -47,7 +45,7 @@ namespace GerenciamentoSalas.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Inserir([FromBody] CriarAgendamentoRequest input)
+        public async Task<IActionResult> Inserir([FromBody] CriarAgendamentoRequest input, CancellationToken cancellationToken = default)
         {
             try
             {
@@ -62,7 +60,7 @@ namespace GerenciamentoSalas.API.Controllers
                     Status = input.Status
                 };
 
-                int idGerado = await  _agendamentoService.InserirAgendamentoAsync(agendamento);
+                int idGerado = await  _agendamentoService.InserirAgendamentoAsync(agendamento, cancellationToken);
 
                 return StatusCode(201, new
                 {
@@ -77,11 +75,11 @@ namespace GerenciamentoSalas.API.Controllers
         }
 
         [HttpDelete]
-        public async Task<IActionResult> Deletar([FromBody]DeletarAgendamentoRequest request) {
+        public async Task<IActionResult> Deletar([FromBody]DeletarAgendamentoRequest request, CancellationToken cancellationToken = default) {
 
             try
             {
-                int idDeletado = await _agendamentoService.DeletarAgendamentoAsync(request);
+                int idDeletado = await _agendamentoService.DeletarAgendamentoAsync(request, cancellationToken);
 
                 return StatusCode(200, $"O Agendamento com o ID {idDeletado} foi deletado com sucesso");
             }
