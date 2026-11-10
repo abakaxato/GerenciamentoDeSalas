@@ -26,7 +26,7 @@ builder.Services.AddScoped<IAgendamentoService,AgendamentoService>();
 builder.Services.AddScoped<IAgendamentoRepository, AgendamentoRepository>();
 builder.Services.AddScoped<IPacienteService, PacienteService>();
 builder.Services.AddScoped<ICommonService, CommonService>();
-builder.Services.AddScoped<CommonRepository>();
+builder.Services.AddScoped<ICommonRepository, CommonRepository>();
 builder.Services.AddControllers();
 builder.Services.AddDbContext<GerenciamentoContext>(opts => opts.UseSqlServer(builder.Configuration.GetConnectionString("ConexaoPadrao")));
 
