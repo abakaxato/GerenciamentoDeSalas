@@ -1,7 +1,6 @@
-﻿using GerenciamentoSalas.API.DTOs;
-using GerenciamentoSalas.API.Models;
+﻿using GerenciamentoSalas.API.Models.DTOs;
+using GerenciamentoSalas.API.Models.Requests;
 using GerenciamentoSalas.API.Repositories;
-using GerenciamentoSalas.API.Requests;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GerenciamentoSalas.API.Controllers
@@ -40,7 +39,7 @@ namespace GerenciamentoSalas.API.Controllers
             {
                 if (input == null) return BadRequest("Dados inválidos.");
 
-                var sala = new Sala
+                var sala = new SalaDto
                 {
                     Nome = input.Nome,
                     Capacidade = input.Capacidade,

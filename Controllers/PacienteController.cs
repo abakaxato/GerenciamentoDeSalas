@@ -1,6 +1,7 @@
 ﻿using GerenciamentoSalas.API.Models;
+using GerenciamentoSalas.API.Models.DTOs;
+using GerenciamentoSalas.API.Models.Requests;
 using GerenciamentoSalas.API.Repositories;
-using GerenciamentoSalas.API.Requests;
 using GerenciamentoSalas.API.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -53,7 +54,7 @@ namespace GerenciamentoSalas.API.Controllers
 
                 if (request == null) return BadRequest("Dados inválidos.");
                 
-                var novoPaciente = new Paciente {
+                var novoPaciente = new PacienteDto {
                     ResponsavelId = request.ResponsavelId,
                     Nome = request.Nome,
                     DataNascimento = request.DataNascimento,

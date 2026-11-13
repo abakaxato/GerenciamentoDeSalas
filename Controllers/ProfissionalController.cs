@@ -1,8 +1,4 @@
-﻿using GerenciamentoSalas.API.DTOs;
-using GerenciamentoSalas.API.Models;
-using GerenciamentoSalas.API.Repositories;
-using GerenciamentoSalas.API.Requests;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 
 namespace GerenciamentoSalas.API.Controllers
 {
