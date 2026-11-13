@@ -25,9 +25,8 @@ namespace GerenciamentoSalas.API.Repositories
             {
                 _logger.LogInformation($"Busca por agendamento {id} iniciada");
                 
-                AgendamentoDto? agendamento = await _dbContext.Agendamentos.
-                    Where(x => x.Id == id).FirstAsync(cancellationToken);
-
+                AgendamentoDto? agendamento = _dbContext.Agendamentos.
+                    Where(x => x.Id == id).FirstOrDefault();
                 _logger.LogInformation($"Busca por agendamento {id} finalizada");
                 return agendamento;
             }
