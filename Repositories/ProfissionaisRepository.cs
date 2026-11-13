@@ -1,8 +1,7 @@
 ﻿using System.Data;
 using Microsoft.Data.SqlClient;
-using GerenciamentoSalas.API.Models;
 using System.Transactions;
-using GerenciamentoSalas.API.Requests;
+using GerenciamentoSalas.API.Models.DTOs;
 
 namespace GerenciamentoSalas.API.Repositories
 {
@@ -16,9 +15,9 @@ namespace GerenciamentoSalas.API.Repositories
                 ?? throw new ArgumentNullException("String de conexão não encontrada.");
         }
 
-        public List<Profissional> ObterTodosProfissional()
+        public List<ProfissionalDto> ObterTodosProfissional()
         {
-            var lista = new List<Profissional>();
+            var lista = new List<ProfissionalDto>();
 
             using (var conexao = new SqlConnection(_connectionString))
             {
@@ -31,7 +30,7 @@ namespace GerenciamentoSalas.API.Repositories
                     {
                         while (reader.Read())
                         {
-                            var prof = new Profissional
+                            var prof = new ProfissionalDto
                             {
                                 Id = Convert.ToInt32(reader["Id"]),
                                 Nome = reader["Nome"].ToString() ?? string.Empty,
@@ -46,7 +45,7 @@ namespace GerenciamentoSalas.API.Repositories
             return lista;
         }
 
-        public int InserirProfissional(Profissional profissional)
+        public int InserirProfissional(ProfissionalDto profissional)
         {
             using var conexao = new SqlConnection(_connectionString);
             string sql = @"INSERT INTO Profissionais (Nome, Especialidade, Ativo) 

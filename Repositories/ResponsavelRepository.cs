@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.Data.SqlClient;
-using GerenciamentoSalas.API.Models;
-using GerenciamentoSalas.API.Requests;
+﻿using Microsoft.Data.SqlClient;
+using GerenciamentoSalas.API.Models.DTOs;
 
 namespace GerenciamentoSalas.API.Repositories
 {
@@ -17,9 +13,9 @@ namespace GerenciamentoSalas.API.Repositories
                 ?? throw new ArgumentNullException("String de conexão não encontrada.");
         }
 
-        public async Task<List<Responsavel>> ObterTodosResponsavelAsync()
+        public async Task<List<ResponsavelDto>> ObterTodosResponsavelAsync()
         {
-            var lista = new List<Responsavel>();
+            var lista = new List<ResponsavelDto>();
 
             using var conexao = new SqlConnection(_connectionString);
             string sql = "SELECT Id, Nome, Telefone, Email, DataCadastro FROM Responsaveis";
@@ -30,7 +26,7 @@ namespace GerenciamentoSalas.API.Repositories
             using var reader = await comando.ExecuteReaderAsync();
             while (await reader.ReadAsync())
             {
-                var resp = new Responsavel
+                var resp = new ResponsavelDto
                 {
                     Id = Convert.ToInt32(reader["Id"]),
                     Nome = reader["Nome"].ToString() ?? string.Empty,
@@ -45,7 +41,7 @@ namespace GerenciamentoSalas.API.Repositories
             return lista;
         }
 
-        public async Task<int> InserirAsync(Responsavel responsavel)
+        public async Task<int> InserirAsync(ResponsavelDto responsavel)
         {
             using var conexao = new SqlConnection(_connectionString);
             string sql = @"INSERT INTO Responsaveis (Nome, Telefone, Email) 

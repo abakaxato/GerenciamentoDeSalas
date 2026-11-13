@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace GerenciamentoSalas.API.Models;
+namespace GerenciamentoSalas.API.Models.DTOs;
 
-public partial class Agendamento
+public partial class AgendamentoDto
 {
     public int Id { get; set; }
 
@@ -21,11 +21,11 @@ public partial class Agendamento
 
     public string? Observacoes { get; set; }
 
-    public virtual Paciente Paciente { get; set; } = null!;
+    public virtual PacienteDto Paciente { get; set; } = null!;
 
-    public virtual Profissional Profissional { get; set; } = null!;
+    public virtual ProfissionalDto Profissional { get; set; } = null!;
 
-    public virtual Sala Sala { get; set; } = null!;
+    public virtual SalaDto Sala { get; set; } = null!;
 
     public override string ToString()
     {

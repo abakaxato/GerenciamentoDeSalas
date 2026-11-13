@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace GerenciamentoSalas.API.Models;
+namespace GerenciamentoSalas.API.Models.DTOs;
 
-public partial class Responsavei
+public partial class ResponsavelDto
 {
     public int Id { get; set; }
 
@@ -15,5 +15,9 @@ public partial class Responsavei
 
     public DateTime DataCadastro { get; set; }
 
-    public virtual ICollection<Paciente> Pacientes { get; set; } = new List<Paciente>();
+    public virtual ICollection<PacienteDto> Pacientes { get; set; } = new List<PacienteDto>();
+    public override string ToString()
+    {
+        return Id.ToString();
+    }
 }

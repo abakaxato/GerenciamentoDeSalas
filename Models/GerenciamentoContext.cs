@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using GerenciamentoSalas.API.Models.DTOs;
 using Microsoft.EntityFrameworkCore;
 
 namespace GerenciamentoSalas.API.Models;
@@ -15,19 +16,19 @@ public partial class GerenciamentoContext : DbContext
     {
     }
 
-    public virtual DbSet<Agendamento> Agendamentos { get; set; }
+    public virtual DbSet<AgendamentoDto> Agendamentos { get; set; }
 
-    public virtual DbSet<Paciente> Pacientes { get; set; }
+    public virtual DbSet<PacienteDto> Pacientes { get; set; }
 
-    public virtual DbSet<Profissional> Profissionais { get; set; }
+    public virtual DbSet<ProfissionalDto> Profissionais { get; set; }
 
-    public virtual DbSet<Responsavei> Responsaveis { get; set; }
+    public virtual DbSet<ResponsavelDto> Responsaveis { get; set; }
 
-    public virtual DbSet<Sala> Salas { get; set; }
+    public virtual DbSet<SalaDto> Salas { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Agendamento>(entity =>
+        modelBuilder.Entity<AgendamentoDto>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__Agendame__3214EC07F50E89A4");
 
@@ -57,7 +58,7 @@ public partial class GerenciamentoContext : DbContext
                 .HasConstraintName("FK_Agendamentos_Salas");
         });
 
-        modelBuilder.Entity<Paciente>(entity =>
+        modelBuilder.Entity<PacienteDto>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__Paciente__3214EC07D3243B0C");
 
@@ -72,7 +73,7 @@ public partial class GerenciamentoContext : DbContext
                 .HasConstraintName("FK_Pacientes_Responsaveis");
         });
 
-        modelBuilder.Entity<Profissional>(entity =>
+        modelBuilder.Entity<ProfissionalDto>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__Profissi__3214EC07333F1594");
 
@@ -88,7 +89,7 @@ public partial class GerenciamentoContext : DbContext
                 .IsUnicode(false);
         });
 
-        modelBuilder.Entity<Responsavei>(entity =>
+        modelBuilder.Entity<ResponsavelDto>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__Responsa__3214EC075CB83DF2");
 
@@ -104,7 +105,7 @@ public partial class GerenciamentoContext : DbContext
                 .IsUnicode(false);
         });
 
-        modelBuilder.Entity<Sala>(entity =>
+        modelBuilder.Entity<SalaDto>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__Salas__3214EC07A984516E");
 

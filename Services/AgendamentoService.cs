@@ -1,8 +1,8 @@
-﻿using GerenciamentoSalas.API.Common.Service.Interface;
-using GerenciamentoSalas.API.DTOs;
+﻿using GerenciamentoSalas.API.Common.Exceptions;
+using GerenciamentoSalas.API.Common.Service.Interface;
 using GerenciamentoSalas.API.Enums;
-using GerenciamentoSalas.API.Exceptions;
-using GerenciamentoSalas.API.Models;
+using GerenciamentoSalas.API.Models.DTOs;
+using GerenciamentoSalas.API.Models.Requests;
 using GerenciamentoSalas.API.Repositories.Interfaces;
 using GerenciamentoSalas.API.Services.Interfaces;
 using Microsoft.IdentityModel.Tokens;
@@ -21,15 +21,15 @@ namespace GerenciamentoSalas.API.Services
             _logger = logger;
         }
 
-        public async Task<Agendamento?> ObterAgendamentoPorIDAsync(int id, CancellationToken cancellationToken = default)
+        public async Task<AgendamentoDto?> ObterAgendamentoPorIDAsync(int id, CancellationToken cancellationToken = default)
         {
-            Agendamento? agendamento = await _agendamentoRepository.ObterAgendamentoPorIDAsync(id, cancellationToken);
+            AgendamentoDto? agendamento = await _agendamentoRepository.ObterAgendamentoPorIdAsync(id, cancellationToken);
             return agendamento;
         }
 
-        public async Task<List<Agendamento>> ObterTodosAgendamentoAsync(CancellationToken cancellationToken = default)
+        public async Task<List<AgendamentoDto>> ObterTodosAgendamentoAsync(CancellationToken cancellationToken = default)
         {
-            List<Agendamento> agendamentos = await _agendamentoRepository.ObterTodosAgendamentoAsync(cancellationToken);
+            List<AgendamentoDto> agendamentos = await _agendamentoRepository.ObterTodosAgendamentoAsync(cancellationToken);
             return agendamentos;
         }
 
@@ -37,7 +37,7 @@ namespace GerenciamentoSalas.API.Services
         {
             if (request == null)
             {
-                _logger.LogError("Erro ao inserir agendamento, requsição vazia");
+                _logger.LogError("Erro ao inserir agendamento, requisição vazia");
                 throw new ArgumentNullException($"{request}");
             }
 
@@ -47,19 +47,19 @@ namespace GerenciamentoSalas.API.Services
                 throw new InvalidOperationException("Erro ao inserir agendamento, a data de término deve ser maior que a data de início.");
             }
 
-            Sala sala = new() { Id = request.SalaId};
-            bool disponibilidadeSala = await _commonService.VerificarDisponibilidade(sala, request.DataHoraInicio,request.DataHoraFim);
-            if (!disponibilidadeSala) { throw new ConflitoHorarioException("Já existe um agendamento para este horário nesta sala");}
-
-            Paciente paciente = new() { Id = request.PacienteId };
-            bool disponibilidadePaciente = await _commonService.VerificarDisponibilidade(paciente, request.DataHoraInicio, request.DataHoraFim);
-            if (!disponibilidadePaciente) { throw new ConflitoHorarioException("Já existe um agendamento para este horário com esse paciente"); }
+            SalaDto sala = new() { Id = request.SalaId};
+            bool salaDisponivel = await _commonService.VerificarDisponibilidade(sala,request.DataHoraInicio,request.DataHoraFim,cancellationToken);
+            if (!salaDisponivel) { throw new DisponibilidadeException(sala, request.DataHoraInicio, request.DataHoraFim, "sala"); }
             
-            Profissional profissional = new() { Id = request.ProfissionalId };
-            bool disponibilidadeProfissional = await _commonService.VerificarDisponibilidade(profissional, request.DataHoraInicio, request.DataHoraFim);
-            if (!disponibilidadeProfissional) { throw new ConflitoHorarioException("Já existe um agendamento para este horário com esse profisional");}
+            PacienteDto paciente = new() { Id = request.PacienteId };
+            bool pacienteDisponivel = await _commonService.VerificarDisponibilidade(paciente, request.DataHoraInicio, request.DataHoraFim, cancellationToken);
+            if (!pacienteDisponivel) { throw new DisponibilidadeException(paciente, request.DataHoraInicio, request.DataHoraFim, "paciente"); }
 
-            Agendamento agendamento = new()
+            ProfissionalDto profissional = new() { Id = request.ProfissionalId };
+            bool profissionalDisponivel = await _commonService.VerificarDisponibilidade(profissional, request.DataHoraInicio, request.DataHoraFim, cancellationToken);
+            if (!profissionalDisponivel) { throw new DisponibilidadeException(profissional, request.DataHoraInicio, request.DataHoraFim, "profissional"); }
+
+            AgendamentoDto agendamento = new()
             {
                 PacienteId = request.PacienteId,
                 ProfissionalId = request.ProfissionalId,
@@ -76,17 +76,73 @@ namespace GerenciamentoSalas.API.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Erro ao inserir agendamento");
+                _logger.LogError(ex, "Erro ao inserir agendamento") ;
                 throw;
             }
             return agendamento.Id;
         }
 
+        public async Task<AgendamentoDto> AtualizarAgendamentoAsync(int id,AtualizarAgendamentoRequest request, CancellationToken cancellationToken)
+        {
+            if (request == null)
+            {
+                _logger.LogError("Erro ao atualizar agendamento, requisição vazia");
+                throw new ArgumentNullException($"{request}");
+            }
+
+            if (request.DataHoraFim <= request.DataHoraInicio)
+            {
+                _logger.LogError("Erro ao atualizar agendamento, a data de término deve ser maior que a data de início.");
+                throw new InvalidOperationException("Erro ao atualizar agendamento, a data de término deve ser maior que a data de início.");
+            }
+            try
+            {
+                AgendamentoDto? agendamentoBanco = await _agendamentoRepository.ObterAgendamentoPorIdAsync(id, cancellationToken);
+                if (agendamentoBanco != null)
+                {
+                    if (request.DataHoraInicio.HasValue && request.DataHoraFim.HasValue)
+                    {
+                        DateTime inicio = request.DataHoraInicio.Value;
+                        DateTime fim = request.DataHoraFim.Value;
+
+                        SalaDto sala = new() { Id = agendamentoBanco.SalaId };
+                        bool salaDisponivel = await _commonService.VerificarDisponibilidade(sala, inicio, fim, cancellationToken);
+                        if (!salaDisponivel) { throw new DisponibilidadeException(sala, inicio, fim, "sala"); }
+
+                        PacienteDto paciente = new() { Id = agendamentoBanco.PacienteId };
+                        bool pacienteDisponivel = await _commonService.VerificarDisponibilidade(paciente, inicio, fim, cancellationToken);
+                        if (!pacienteDisponivel) { throw new DisponibilidadeException(paciente, inicio, fim, "paciente"); }
+
+                        ProfissionalDto profissional = new() { Id = agendamentoBanco.ProfissionalId };
+                        bool profissionalDisponivel = await _commonService.VerificarDisponibilidade(profissional, inicio, fim, cancellationToken);
+                        if (!profissionalDisponivel) { throw new DisponibilidadeException(profissional, inicio, fim, "profissional"); }
+                    }
+                }
+                else{ throw new KeyNotFoundException($"Nao foi possivel atualizar o agendamento {id}, ID nao encontrado no banco");}
+
+                AtualizarAgendamentoDto AtualizarAgendamentoDto = new()
+                {
+                    Id = id,
+                    DataHoraInicio = request.DataHoraInicio,
+                    DataHoraFim = request.DataHoraFim,
+                    Observacoes = request.Observacoes,
+                    Status = request.Status
+                };
+
+                AgendamentoDto agendamentoAtualizado = await _agendamentoRepository.AtualizarAgendamentoAsync(AtualizarAgendamentoDto, cancellationToken);
+                return agendamentoAtualizado;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Erro ao atualizar agendamento");
+                throw;
+            }
+        }
         public async Task<int> DeletarAgendamentoAsync(int id, CancellationToken cancellationToken = default)
         {
             try
             {
-                Agendamento? agendamento = await _agendamentoRepository.ObterAgendamentoPorIDAsync(id, cancellationToken);
+                AgendamentoDto? agendamento = await _agendamentoRepository.ObterAgendamentoPorIdAsync(id, cancellationToken);
                 if (agendamento is null)
                 {
                     _logger.LogError("A pesquisa pelo agendamento no banco não retornou nenhuma linha, deleção incompleta");
@@ -99,6 +155,11 @@ namespace GerenciamentoSalas.API.Services
 
                 _logger.LogInformation($"Agendamento com ID {agendamento.Id} removido com sucesso");
                 return agendamento.Id;
+            }
+            catch(InvalidOperationException ex)
+            {
+                _logger.LogError(ex, $"O Agendamento com ID {id} nao existe");
+                throw;
             }
             catch (Exception ex)
             {

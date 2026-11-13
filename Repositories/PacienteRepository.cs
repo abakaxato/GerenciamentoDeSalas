@@ -1,6 +1,5 @@
 ﻿using Microsoft.Data.SqlClient;
-using GerenciamentoSalas.API.Models;
-using GerenciamentoSalas.API.Requests;
+using GerenciamentoSalas.API.Models.DTOs;
 
 namespace GerenciamentoSalas.API.Repositories
 {
@@ -13,9 +12,9 @@ namespace GerenciamentoSalas.API.Repositories
                ?? throw new ArgumentNullException("String de conexão não encontrada");
         }
 
-        public List<Paciente> ObterTodosPaciente() {
+        public List<PacienteDto> ObterTodosPaciente() {
 
-            var lista = new List<Paciente>();
+            var lista = new List<PacienteDto>();
 
             using (var conexao = new SqlConnection(_connectionString)) {
                 
@@ -29,7 +28,7 @@ namespace GerenciamentoSalas.API.Repositories
                         
                         while (reader.Read()) {
 
-                            var paci = new Paciente
+                            var paci = new PacienteDto
                             {
                                 Id = Convert.ToInt32(reader["Id"]),
                                 ResponsavelId = Convert.ToInt32(reader["ResponsavelId"]),
@@ -46,7 +45,7 @@ namespace GerenciamentoSalas.API.Repositories
             return lista;
         }
 
-        public int InserirPaciente(Paciente paciente) {
+        public int InserirPaciente(PacienteDto paciente) {
             using (var conexao = new SqlConnection(_connectionString))
             {
                 string sql = @"INSERT INTO Pacientes (ResponsavelId, Nome, DataNascimento) 

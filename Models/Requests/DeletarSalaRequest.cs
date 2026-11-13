@@ -1,4 +1,4 @@
-﻿namespace GerenciamentoSalas.API.Requests
+﻿namespace GerenciamentoSalas.API.Models.Requests
 {
     public class DeletarSalaRequest
     {

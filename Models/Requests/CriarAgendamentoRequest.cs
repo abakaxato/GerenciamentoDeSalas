@@ -1,6 +1,6 @@
 ﻿using GerenciamentoSalas.API.Enums;
 
-namespace GerenciamentoSalas.API.DTOs
+namespace GerenciamentoSalas.API.Models.Requests
 {
     public class CriarAgendamentoRequest
     {
