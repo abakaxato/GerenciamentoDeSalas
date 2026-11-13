@@ -90,7 +90,7 @@ namespace GerenciamentoSalas.API.Services
                 throw new ArgumentNullException($"{request}");
             }
 
-            if (request.DataHoraFim <= request.DataHoraInicio)
+            if (request.DataHoraInicio >= request.DataHoraFim)
             {
                 _logger.LogError("Erro ao atualizar agendamento, a data de término deve ser maior que a data de início.");
                 throw new InvalidOperationException("Erro ao atualizar agendamento, a data de término deve ser maior que a data de início.");
@@ -100,10 +100,16 @@ namespace GerenciamentoSalas.API.Services
                 AgendamentoDto? agendamentoBanco = await _agendamentoRepository.ObterAgendamentoPorIdAsync(id, cancellationToken);
                 if (agendamentoBanco != null)
                 {
-                    if (request.DataHoraInicio.HasValue && request.DataHoraFim.HasValue)
+                    if (request.DataHoraInicio.HasValue || request.DataHoraFim.HasValue)
                     {
-                        DateTime inicio = request.DataHoraInicio.Value;
-                        DateTime fim = request.DataHoraFim.Value;
+                        DateTime inicio = request.DataHoraInicio ?? agendamentoBanco.DataHoraInicio;
+                        DateTime fim = request.DataHoraFim ?? agendamentoBanco.DataHoraInicio;
+                        
+                        if (request.DataHoraInicio >= request.DataHoraFim)
+                        {
+                            _logger.LogError("Erro ao atualizar agendamento, a data de término deve ser maior que a data de início.");
+                            throw new InvalidOperationException("Erro ao atualizar agendamento, a data de término deve ser maior que a data de início.");
+                        }
 
                         SalaDto sala = new() { Id = agendamentoBanco.SalaId };
                         bool salaDisponivel = await _commonService.VerificarDisponibilidade(sala, inicio, fim, cancellationToken);
