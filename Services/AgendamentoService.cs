@@ -25,7 +25,7 @@ namespace GerenciamentoSalas.API.Services
             _logger.LogInformation($"Busca por agendamento {id} iniciada");
 
             AgendamentoDto? agendamento = await _agendamentoRepository.ObterAgendamentoPorIdAsync(id, cancellationToken);
-            
+
             _logger.LogInformation($"Busca por agendamento {id} finalizada");
 
             return agendamento;
@@ -36,7 +36,7 @@ namespace GerenciamentoSalas.API.Services
             _logger.LogInformation($"Busca por todos os agendamentos iniciada");
 
             List<AgendamentoDto> agendamentos = await _agendamentoRepository.ObterTodosAgendamentoAsync(cancellationToken);
-            
+
             _logger.LogInformation($"Busca por todos os agendamentos finalizada");
 
             return agendamentos;
@@ -81,7 +81,7 @@ namespace GerenciamentoSalas.API.Services
 
 
             int idGerado = await _agendamentoRepository.InserirAgendamentoAsync(agendamento, cancellationToken);
-            
+
             _logger.LogInformation($"Agendamento inserido com sucesso. {agendamento.Id}");
 
             return idGerado;

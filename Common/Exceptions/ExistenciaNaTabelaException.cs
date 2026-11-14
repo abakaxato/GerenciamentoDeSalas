@@ -4,6 +4,6 @@
     {
         public ExistenciaNaTabelaException() : base() { }
         public ExistenciaNaTabelaException(object? obj)
-            : base($"O ID {obj} não existe na tabela selecionada."){ }
+            : base($"O ID {obj} não existe na tabela selecionada.") { }
     }
 }
