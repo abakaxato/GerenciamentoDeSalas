@@ -106,9 +106,9 @@ namespace GerenciamentoSalas.API.Services
                 if (request.DataHoraInicio.HasValue || request.DataHoraFim.HasValue)
                 {
                     DateTime inicio = request.DataHoraInicio ?? agendamentoBanco.DataHoraInicio;
-                    DateTime fim = request.DataHoraFim ?? agendamentoBanco.DataHoraInicio;
+                    DateTime fim = request.DataHoraFim ?? agendamentoBanco.DataHoraFim;
 
-                    if (request.DataHoraInicio >= request.DataHoraFim)
+                    if (inicio >= fim)
                     {
                         _logger.LogError("Erro ao atualizar agendamento, a data de término deve ser maior que a data de início.");
                         throw new InvalidOperationException("Erro ao atualizar agendamento, a data de término deve ser maior que a data de início.");

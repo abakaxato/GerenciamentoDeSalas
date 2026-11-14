@@ -32,7 +32,7 @@ namespace GerenciamentoSalas.API.Common.Service
             bool existe = await VerificarExistenciaAsync(entidade, cancellationToken);
             bool disponivel = await VerificarDisponibilidadeAsync(entidade, DataInicio, DataFim, agendamentoIdIgnorar, cancellationToken);
 
-            if (existe & disponivel)
+            if (existe && disponivel)
             {
                 return true;
             }

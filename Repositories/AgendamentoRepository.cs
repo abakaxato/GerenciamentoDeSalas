@@ -22,8 +22,8 @@ namespace GerenciamentoSalas.API.Repositories
 
         public async Task<AgendamentoDto?> ObterAgendamentoPorIdAsync(int id, CancellationToken cancellationToken = default)
         {
-            AgendamentoDto? agendamento = _dbContext.Agendamentos.
-                Where(x => x.Id == id).FirstOrDefault();
+            AgendamentoDto? agendamento = await _dbContext.Agendamentos.
+                Where(x => x.Id == id).FirstOrDefaultAsync(cancellationToken);
 
             return agendamento;
         }
@@ -45,15 +45,15 @@ namespace GerenciamentoSalas.API.Repositories
         public async Task<AgendamentoDto> AtualizarAgendamentoAsync(AtualizarAgendamentoDto atualizarAgendamentoDto, CancellationToken cancellationToken = default)
         {
 
-            AgendamentoDto? agendamentoBanco = _dbContext.Agendamentos
+            AgendamentoDto? agendamentoBanco = await _dbContext.Agendamentos
                 .Where(x => x.Id == atualizarAgendamentoDto.Id)
-                .FirstOrDefault();
+                .FirstOrDefaultAsync(cancellationToken);
 
             if (agendamentoBanco is not null)
             {
                 if (atualizarAgendamentoDto.DataHoraInicio.HasValue) { agendamentoBanco.DataHoraInicio = atualizarAgendamentoDto.DataHoraInicio.Value; }
                 if (atualizarAgendamentoDto.DataHoraFim.HasValue) { agendamentoBanco.DataHoraFim = atualizarAgendamentoDto.DataHoraFim.Value; }
-                if (!atualizarAgendamentoDto.Observacoes.IsNullOrEmpty()) { agendamentoBanco.Observacoes = atualizarAgendamentoDto.Observacoes; }
+                if (atualizarAgendamentoDto.Observacoes != null) { agendamentoBanco.Observacoes = atualizarAgendamentoDto.Observacoes; }
                 if (atualizarAgendamentoDto.Status.HasValue) { agendamentoBanco.Status = atualizarAgendamentoDto.Status.Value; }
 
                 await _dbContext.SaveChangesAsync(cancellationToken);

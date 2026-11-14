@@ -38,7 +38,7 @@ namespace GerenciamentoSalas.API.Controllers
         {
             int idGerado = await _agendamentoService.InserirAgendamentoAsync(criarAgendamentoRequest, cancellationToken);
 
-            return Ok(idGerado);
+            return Created("Criado com sucesso",idGerado);
         }
         [HttpPatch]
         [Route("{id:int}")]
