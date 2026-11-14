@@ -43,6 +43,9 @@ namespace GerenciamentoSalas.API.Controllers
                     Id = idGerado,
                     Mensagem = "Agendamento inserido com sucesso."
                 });
+            }catch(ArgumentException ex)
+            {
+                return StatusCode(404,$"Entidade não registrada para verificar existencia:{ex.Message}");
             }
             catch (Exception ex)
             {
