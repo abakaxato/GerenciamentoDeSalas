@@ -22,9 +22,9 @@ namespace GerenciamentoSalas.API.Common.Service
         }
         public async Task<bool> VerificarExistenciaAsync<T>(T entidade, CancellationToken cancellationToken = default)
         {
-            bool disponivel = await _commonRepository.VerificarExistenciaAsync(entidade, cancellationToken);
-            if (!disponivel) { _logger.LogInformation($"{entidade} nao existe"); throw new ExistenciaNaTabelaException(entidade); }
-            return disponivel;
+            bool existe = await _commonRepository.VerificarExistenciaAsync(entidade, cancellationToken);
+            if (!existe) { _logger.LogInformation($"{entidade} nao existe"); throw new ExistenciaNaTabelaException(entidade); }
+            return existe;
         }
         public async Task<bool> VerificarExistenciaDisponibilidadeAsync<T>(T entidade, DateTime DataInicio, DateTime DataFim, int? agendamentoIdIgnorar = null, CancellationToken cancellationToken = default)
         {

@@ -53,33 +53,33 @@ namespace GerenciamentoSalas.API.Common.Repositorie
         }
         public async Task<bool> VerificarExistenciaAsync<T>(T entidade, CancellationToken cancellationToken = default)
         {
-            bool disponivel = true;
+            bool existe = true;
             switch (entidade)
             {
                 case (PacienteDto paciente):
                     List<PacienteDto> registrosPaciente = await _dbContext.Pacientes.
                         Where(x => x.Id == paciente.Id)
                         .ToListAsync(cancellationToken);
-                    if (!registrosPaciente.IsNullOrEmpty()) { disponivel = false; }
+                    if (registrosPaciente.IsNullOrEmpty()) { existe = false; }
                     break;
                 case (SalaDto sala):
                     List<SalaDto> registrosSala = await _dbContext.Salas.
                         Where(x => x.Id == sala.Id)
                         .ToListAsync(cancellationToken);
-                    if (!registrosSala.IsNullOrEmpty()) { disponivel = false; }
+                    if (registrosSala.IsNullOrEmpty()) { existe = false; }
                     break;
                 case (ProfissionalDto profissional):
                     List<ProfissionalDto> registrosProfissional = await _dbContext.Profissionais.
                         Where(x => x.Id == profissional.Id)
                         .ToListAsync(cancellationToken);
-                    if (!registrosProfissional.IsNullOrEmpty()) { disponivel = false; }
+                    if (registrosProfissional.IsNullOrEmpty()) { existe = false; }
                     break;
                 default:
-                    disponivel = false;
+                    existe = false;
                     _logger.LogError("Entidade não registrada para verificar existencia");
                     throw new ArgumentException("Entidade não registrada para verificar existencia");
             }
-            return disponivel;
+            return existe;
         }
     }
 }
