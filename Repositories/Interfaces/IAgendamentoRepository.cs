@@ -7,7 +7,7 @@ namespace GerenciamentoSalas.API.Repositories.Interfaces
         public Task<AgendamentoDto?> ObterAgendamentoPorIdAsync(int id, CancellationToken cancellationToken = default);
         public Task<List<AgendamentoDto>> ObterTodosAgendamentoAsync(CancellationToken cancellationToken = default);
         public Task<int> InserirAgendamentoAsync(AgendamentoDto agendamento, CancellationToken cancellationToken = default);
-        public Task<AgendamentoDto> AtualizarAgendamentoAsync(AtualizarAgendamentoDto atualizarAgendamento, CancellationToken cancellationToken = default);
+        public Task<AgendamentoDto?> AtualizarAgendamentoAsync(AtualizarAgendamentoDto atualizarAgendamento, CancellationToken cancellationToken = default);
         public Task<int> DeletarAgendamentoAsync(AgendamentoDto agendamento, CancellationToken cancellationToken = default);
     }
 }

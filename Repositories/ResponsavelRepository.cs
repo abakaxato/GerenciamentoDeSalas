@@ -1,5 +1,5 @@
-﻿using Microsoft.Data.SqlClient;
-using GerenciamentoSalas.API.Models.DTOs;
+﻿using GerenciamentoSalas.API.Models.DTOs;
+using Microsoft.Data.SqlClient;
 
 namespace GerenciamentoSalas.API.Repositories
 {

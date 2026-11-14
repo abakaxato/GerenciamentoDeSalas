@@ -1,7 +1,6 @@
-﻿using System.Data;
-using Microsoft.Data.SqlClient;
-using GerenciamentoSalas.API.Models.DTOs;
+﻿using GerenciamentoSalas.API.Models.DTOs;
 using GerenciamentoSalas.API.Models.Requests;
+using Microsoft.Data.SqlClient;
 
 namespace GerenciamentoSalas.API.Repositories
 {
@@ -59,9 +58,10 @@ namespace GerenciamentoSalas.API.Repositories
             return Convert.ToInt32(comando.ExecuteScalar());
         }
 
-        public async Task<(int salaDeletada, List<int> agendamentosDeletados)> DeletarSalaAsync(DeletarSalaRequest request){ 
+        public async Task<(int salaDeletada, List<int> agendamentosDeletados)> DeletarSalaAsync(DeletarSalaRequest request)
+        {
 
-            using var conexao =  new SqlConnection(_connectionString);
+            using var conexao = new SqlConnection(_connectionString);
             await conexao.OpenAsync();
             using var transaction = conexao.BeginTransaction();
 
@@ -72,19 +72,20 @@ namespace GerenciamentoSalas.API.Repositories
                     FROM [bd_gerenciamento].[dbo].[Agendamentos]
                     INNER JOIN [bd_gerenciamento].[dbo].[Salas] ON [bd_gerenciamento].[dbo].[Salas].[Id] = [bd_gerenciamento].[dbo].[Agendamentos].[SalaId]
                     where [bd_gerenciamento].[dbo].[Salas].[Id] = @IdSala";
-                
+
                 var IdsDeletadosAgendamento = new List<int>();
 
                 using (var cmd = new SqlCommand(sqlAgendamento, conexao, transaction))
                 {
                     cmd.Parameters.AddWithValue("@IdSala", request.id);
-                    
+
                     using var reader = await cmd.ExecuteReaderAsync();
 
-                    while (await reader.ReadAsync()) {
+                    while (await reader.ReadAsync())
+                    {
                         IdsDeletadosAgendamento.Add(reader.GetInt32(0));
                     }
-                
+
                 }
 
                 string sqlSala = @"
@@ -96,17 +97,18 @@ namespace GerenciamentoSalas.API.Repositories
                 int idDeletadoSala = 0;
                 using (var cmd = new SqlCommand(sqlSala, conexao, transaction))
                 {
-                    cmd.Parameters.AddWithValue("@IdSala",request.id);
+                    cmd.Parameters.AddWithValue("@IdSala", request.id);
                     idDeletadoSala = Convert.ToInt32(await cmd.ExecuteScalarAsync());
                 }
                 transaction.Commit();
                 return (idDeletadoSala, IdsDeletadosAgendamento);
             }
-            catch (Exception){
+            catch (Exception)
+            {
                 transaction.Rollback();
                 throw;
             }
-        
+
         }
     }
 }

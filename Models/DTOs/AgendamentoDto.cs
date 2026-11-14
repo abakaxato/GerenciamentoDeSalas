@@ -1,6 +1,4 @@
 ﻿using GerenciamentoSalas.API.Enums;
-using System;
-using System.Collections.Generic;
 
 namespace GerenciamentoSalas.API.Models.DTOs;
 

@@ -23,8 +23,8 @@ namespace GerenciamentoSalas.API.Common.Exceptions
                 KeyNotFoundException => (StatusCodes.Status404NotFound, "Não encontrado"),
                 InvalidOperationException => (StatusCodes.Status409Conflict, "Conflito de regra de negócio"),
                 ArgumentException => (StatusCodes.Status400BadRequest, "Requisição inválida"),
-                DisponibilidadeException => (StatusCodes.Status409Conflict,"Conflito de disponibilidade"),
-                ExistenciaNaTabelaException => (StatusCodes.Status404NotFound,"Nao Existe na tabela"),
+                DisponibilidadeException => (StatusCodes.Status409Conflict, "Conflito de disponibilidade"),
+                ExistenciaNaTabelaException => (StatusCodes.Status404NotFound, "Nao Existe na tabela"),
                 _ => (StatusCodes.Status500InternalServerError, "Erro interno no servidor")
             };
 

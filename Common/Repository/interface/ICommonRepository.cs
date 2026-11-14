@@ -1,6 +1,4 @@
-﻿using GerenciamentoSalas.API.Models;
-
-namespace GerenciamentoSalas.API.Common.Repositorie.interfaces
+﻿namespace GerenciamentoSalas.API.Common.Repositorie.interfaces
 {
     public interface ICommonRepository
     {

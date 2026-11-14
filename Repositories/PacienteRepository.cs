@@ -1,5 +1,5 @@
-﻿using Microsoft.Data.SqlClient;
-using GerenciamentoSalas.API.Models.DTOs;
+﻿using GerenciamentoSalas.API.Models.DTOs;
+using Microsoft.Data.SqlClient;
 
 namespace GerenciamentoSalas.API.Repositories
 {
@@ -7,26 +7,32 @@ namespace GerenciamentoSalas.API.Repositories
     {
         private readonly string _connectionString;
 
-        public PacienteRepository(IConfiguration configuration) {
+        public PacienteRepository(IConfiguration configuration)
+        {
             _connectionString = configuration.GetConnectionString("ConexaoPadrao")
                ?? throw new ArgumentNullException("String de conexão não encontrada");
         }
 
-        public List<PacienteDto> ObterTodosPaciente() {
+        public List<PacienteDto> ObterTodosPaciente()
+        {
 
             var lista = new List<PacienteDto>();
 
-            using (var conexao = new SqlConnection(_connectionString)) {
-                
+            using (var conexao = new SqlConnection(_connectionString))
+            {
+
                 string sql = "SELECT Id, ResponsavelId, Nome, DataCadastro, DataNascimento FROM Pacientes";
-                
-                using (var comando = new SqlCommand(sql, conexao)) {
-                    
+
+                using (var comando = new SqlCommand(sql, conexao))
+                {
+
                     conexao.Open();
-                    
-                    using (SqlDataReader reader = comando.ExecuteReader()) {
-                        
-                        while (reader.Read()) {
+
+                    using (SqlDataReader reader = comando.ExecuteReader())
+                    {
+
+                        while (reader.Read())
+                        {
 
                             var paci = new PacienteDto
                             {
@@ -34,7 +40,7 @@ namespace GerenciamentoSalas.API.Repositories
                                 ResponsavelId = Convert.ToInt32(reader["ResponsavelId"]),
                                 Nome = reader["Nome"].ToString() ?? string.Empty,
                                 DataCadastro = Convert.ToDateTime(reader["DataCadastro"]),
-                                DataNascimento = reader["DataNascimento"] != DBNull.Value ? 
+                                DataNascimento = reader["DataNascimento"] != DBNull.Value ?
                                     Convert.ToDateTime(reader["DataNascimento"]) : null
                             };
                             lista.Add(paci);
@@ -45,13 +51,15 @@ namespace GerenciamentoSalas.API.Repositories
             return lista;
         }
 
-        public int InserirPaciente(PacienteDto paciente) {
+        public int InserirPaciente(PacienteDto paciente)
+        {
             using (var conexao = new SqlConnection(_connectionString))
             {
                 string sql = @"INSERT INTO Pacientes (ResponsavelId, Nome, DataNascimento) 
                        OUTPUT INSERTED.Id
                        VALUES (@ResponsavelId, @Nome, @DataNascimento);";
-                using (var comando = new SqlCommand(sql, conexao)) {
+                using (var comando = new SqlCommand(sql, conexao))
+                {
                     comando.Parameters.AddWithValue("@ResponsavelId", paciente.ResponsavelId);
                     comando.Parameters.AddWithValue("@Nome", paciente.Nome);
                     comando.Parameters.AddWithValue("@DataNascimento", paciente.DataNascimento);
@@ -80,7 +88,7 @@ namespace GerenciamentoSalas.API.Repositories
                     SELECT @@ROWCOUNT;";
 
                 int AgendamentosDeletados = 0;
-                using (var DelAgendamento = new SqlCommand(sql, conexao,transaction))
+                using (var DelAgendamento = new SqlCommand(sql, conexao, transaction))
                 {
                     DelAgendamento.Parameters.AddWithValue("@PacienteId", id);
 
@@ -94,7 +102,7 @@ namespace GerenciamentoSalas.API.Repositories
                     WHERE P.Id = @PacienteId;";
 
                 int idDeletado = 0;
-                using (var delPaciente = new SqlCommand(sql2, conexao,transaction))
+                using (var delPaciente = new SqlCommand(sql2, conexao, transaction))
                 {
                     delPaciente.Parameters.AddWithValue("@PacienteId", id);
 
@@ -103,13 +111,14 @@ namespace GerenciamentoSalas.API.Repositories
                 transaction.Commit();
                 return (AgendamentosDeletados, idDeletado);
             }
-            catch (Exception ex){
+            catch (Exception ex)
+            {
                 transaction.Rollback();
                 throw new InvalidOperationException("Falha ao deletar paciente", ex);
             }
-            
+
         }
 
     }
-    
+
 }

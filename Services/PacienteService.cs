@@ -15,7 +15,7 @@ namespace GerenciamentoSalas.API.Services
         {
             //Aqui teoricamente o paciente foi validadado, método atualmente implementado como teste
             PacienteDto pacienteTeste = new() { Id = id };
-            bool disponibilidade = await _commonService.VerificarDisponibilidadeAsync(pacienteTeste,DataInicio,DataFim);
+            bool disponibilidade = await _commonService.VerificarDisponibilidadeAsync(pacienteTeste, DataInicio, DataFim);
             return disponibilidade;
         }
     }

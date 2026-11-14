@@ -22,6 +22,8 @@ namespace GerenciamentoSalas.API.Services
 
         public async Task<AgendamentoDto?> ObterAgendamentoPorIDAsync(int id, CancellationToken cancellationToken = default)
         {
+            if (id <= 0) { throw new ArgumentException("ID Menor ou igual a zero"); }
+
             _logger.LogInformation($"Busca por agendamento {id} iniciada");
 
             AgendamentoDto? agendamento = await _agendamentoRepository.ObterAgendamentoPorIdAsync(id, cancellationToken);
@@ -95,11 +97,8 @@ namespace GerenciamentoSalas.API.Services
                 throw new ArgumentNullException($"{request}");
             }
 
-            if (request.DataHoraInicio >= request.DataHoraFim)
-            {
-                _logger.LogError("Erro ao atualizar agendamento, a data de término deve ser maior que a data de início.");
-                throw new InvalidOperationException("Erro ao atualizar agendamento, a data de término deve ser maior que a data de início.");
-            }
+            if (id <= 0) { throw new ArgumentException("ID Menor ou igual a zero"); }
+
             AgendamentoDto? agendamentoBanco = await _agendamentoRepository.ObterAgendamentoPorIdAsync(id, cancellationToken);
             if (agendamentoBanco != null)
             {
@@ -138,14 +137,19 @@ namespace GerenciamentoSalas.API.Services
                 Status = request.Status
             };
 
-            if (String.IsNullOrEmpty(AtualizarAgendamentoDto.Observacoes)) { AtualizarAgendamentoDto.Observacoes = agendamentoBanco.Observacoes; }
+            AtualizarAgendamentoDto.Observacoes ??= agendamentoBanco.Observacoes;
+
             if (!AtualizarAgendamentoDto.Status.HasValue) { AtualizarAgendamentoDto.Status = agendamentoBanco.Status; }
 
-            AgendamentoDto agendamentoAtualizado = await _agendamentoRepository.AtualizarAgendamentoAsync(AtualizarAgendamentoDto, cancellationToken);
+            AgendamentoDto? agendamentoAtualizado = await _agendamentoRepository.AtualizarAgendamentoAsync(AtualizarAgendamentoDto, cancellationToken)
+                ?? throw new ExistenciaNaTabelaException($"Durante a atualizacao nao foram encontrados agendamentos com o ID {AtualizarAgendamentoDto.Id}");
+
             return agendamentoAtualizado;
         }
         public async Task<int> DeletarAgendamentoAsync(int id, CancellationToken cancellationToken = default)
         {
+            if (id <= 0) { throw new ArgumentException("ID Menor ou igual a zero"); }
+
             AgendamentoDto? agendamento = await _agendamentoRepository.ObterAgendamentoPorIdAsync(id, cancellationToken);
             if (agendamento is null)
             {

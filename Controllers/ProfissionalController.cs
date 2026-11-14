@@ -75,5 +75,6 @@ namespace GerenciamentoSalas.API.Controllers
                 return StatusCode(500, $"Erro ao deletar Profissionais: {ex.Message}");
             }
         }
-    */}
+    */
+    }
 }

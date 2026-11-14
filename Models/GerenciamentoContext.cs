@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using GerenciamentoSalas.API.Enums;
+﻿using GerenciamentoSalas.API.Enums;
 using GerenciamentoSalas.API.Models.DTOs;
 using Microsoft.EntityFrameworkCore;
 

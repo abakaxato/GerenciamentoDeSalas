@@ -21,7 +21,7 @@ namespace GerenciamentoSalas.API.Controllers
         public async Task<IActionResult> ObterPorID([FromRoute] int id, CancellationToken cancellationToken = default)
         {
             AgendamentoDto? agendamento = await _agendamentoService.ObterAgendamentoPorIDAsync(id, cancellationToken);
-            if (agendamento == null ){ return NotFound($"Agendamento com ID {id} nao encontrado"); }
+            if (agendamento == null) { return NotFound(agendamento); }
             else { return Ok(agendamento); }
         }
 
@@ -29,8 +29,7 @@ namespace GerenciamentoSalas.API.Controllers
         public async Task<IActionResult> ObterTodos(CancellationToken cancellationToken = default)
         {
             List<AgendamentoDto> agendamentos = await _agendamentoService.ObterTodosAgendamentoAsync(cancellationToken);
-            if (agendamentos.IsNullOrEmpty()) { return NotFound("Nenhum agendamento foi retornado"); }
-            else { return Ok(agendamentos); }
+            return Ok(agendamentos);
         }
 
         [HttpPost]
@@ -38,7 +37,12 @@ namespace GerenciamentoSalas.API.Controllers
         {
             int idGerado = await _agendamentoService.InserirAgendamentoAsync(criarAgendamentoRequest, cancellationToken);
 
-            return Created("Criado com sucesso",idGerado);
+            return CreatedAtAction
+                (
+                nameof(ObterPorID),
+                new { id = idGerado },
+                new { Id = idGerado }
+                );
         }
         [HttpPatch]
         [Route("{id:int}")]

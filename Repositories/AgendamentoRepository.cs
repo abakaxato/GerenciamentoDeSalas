@@ -1,10 +1,7 @@
-﻿using GerenciamentoSalas.API.Common.Exceptions;
-using GerenciamentoSalas.API.Models;
+﻿using GerenciamentoSalas.API.Models;
 using GerenciamentoSalas.API.Models.DTOs;
-using GerenciamentoSalas.API.Models.Requests;
 using GerenciamentoSalas.API.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 
 namespace GerenciamentoSalas.API.Repositories
 {
@@ -22,8 +19,7 @@ namespace GerenciamentoSalas.API.Repositories
 
         public async Task<AgendamentoDto?> ObterAgendamentoPorIdAsync(int id, CancellationToken cancellationToken = default)
         {
-            AgendamentoDto? agendamento = await _dbContext.Agendamentos.
-                Where(x => x.Id == id).FirstOrDefaultAsync(cancellationToken);
+            AgendamentoDto? agendamento = await _dbContext.Agendamentos.FirstOrDefaultAsync(x => x.Id == id,cancellationToken);
 
             return agendamento;
         }
@@ -42,12 +38,10 @@ namespace GerenciamentoSalas.API.Repositories
 
             return agendamento.Id;
         }
-        public async Task<AgendamentoDto> AtualizarAgendamentoAsync(AtualizarAgendamentoDto atualizarAgendamentoDto, CancellationToken cancellationToken = default)
+        public async Task<AgendamentoDto?> AtualizarAgendamentoAsync(AtualizarAgendamentoDto atualizarAgendamentoDto, CancellationToken cancellationToken = default)
         {
 
-            AgendamentoDto? agendamentoBanco = await _dbContext.Agendamentos
-                .Where(x => x.Id == atualizarAgendamentoDto.Id)
-                .FirstOrDefaultAsync(cancellationToken);
+            AgendamentoDto? agendamentoBanco = await _dbContext.Agendamentos.FirstOrDefaultAsync(x => x.Id == atualizarAgendamentoDto.Id,cancellationToken);
 
             if (agendamentoBanco is not null)
             {
@@ -63,7 +57,7 @@ namespace GerenciamentoSalas.API.Repositories
             else
             {
                 _logger.LogError($"Durante a atualizacao nao foram encontrados agendamentos com o ID {atualizarAgendamentoDto.Id}");
-                throw new ExistenciaNaTabelaException($"Durante a atualizacao nao foram encontrados agendamentos com o ID {atualizarAgendamentoDto.Id}");
+                return null;
             }
             ;
         }

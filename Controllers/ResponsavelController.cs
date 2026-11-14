@@ -58,7 +58,7 @@ namespace GerenciamentoSalas.API.Controllers
         }
 
         [HttpDelete]
-        public async Task<IActionResult> Deletar([FromBody]int id)
+        public async Task<IActionResult> Deletar([FromBody] int id)
         {
             try
             {

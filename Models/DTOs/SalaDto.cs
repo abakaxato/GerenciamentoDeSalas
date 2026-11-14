@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace GerenciamentoSalas.API.Models.DTOs;
+﻿namespace GerenciamentoSalas.API.Models.DTOs;
 
 public partial class SalaDto
 {

@@ -1,7 +1,5 @@
-﻿using System.Data;
+﻿using GerenciamentoSalas.API.Models.DTOs;
 using Microsoft.Data.SqlClient;
-using System.Transactions;
-using GerenciamentoSalas.API.Models.DTOs;
 
 namespace GerenciamentoSalas.API.Repositories
 {
@@ -61,20 +59,22 @@ namespace GerenciamentoSalas.API.Repositories
             return Convert.ToInt32(comando.ExecuteScalar());
         }
 
-        public async Task<(List<int> IdAgendamentosDeletados, int IdResponsavelDeletado)> DeletarProfissionaisAsync(int id) {
+        public async Task<(List<int> IdAgendamentosDeletados, int IdResponsavelDeletado)> DeletarProfissionaisAsync(int id)
+        {
 
             using var conexao = new SqlConnection(_connectionString);
             await conexao.OpenAsync();
             using var transaction = conexao.BeginTransaction();
 
-            try {
+            try
+            {
 
                 string sqlAgendamento = @"DELETE [bd_gerenciamento].[dbo].[Agendamentos]
                     OUTPUT deleted.Id
                     FROM [bd_gerenciamento].[dbo].[Agendamentos]
                     INNER JOIN [bd_gerenciamento].[dbo].[Profissionais] ON [bd_gerenciamento].[dbo].[Profissionais].[Id] = [bd_gerenciamento].[dbo].[Agendamentos].[SalaId]
                     where [bd_gerenciamento].[dbo].[Profissionais].[Id] = @IdProfissional";
-                
+
                 var IdsDeletadosAgendamento = new List<int>();
 
                 using (var cmd = new SqlCommand(sqlAgendamento, conexao, transaction))
@@ -87,7 +87,7 @@ namespace GerenciamentoSalas.API.Repositories
                     {
                         IdsDeletadosAgendamento.Add(reader.GetInt32(0));
                     }
-                     
+
                 }
 
                 string sqlProfissionais = @"
@@ -105,7 +105,8 @@ namespace GerenciamentoSalas.API.Repositories
                 transaction.Commit();
                 return (IdsDeletadosAgendamento, idDeletadoProfissionais);
             }
-            catch (Exception) {
+            catch (Exception)
+            {
                 transaction.Rollback();
                 throw;
             }
