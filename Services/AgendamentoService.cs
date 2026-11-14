@@ -144,13 +144,13 @@ namespace GerenciamentoSalas.API.Services
             AgendamentoDto agendamentoAtualizado = await _agendamentoRepository.AtualizarAgendamentoAsync(AtualizarAgendamentoDto, cancellationToken);
             return agendamentoAtualizado;
         }
-        public async Task<int> DeletarAgendamentoAsync(int id, CancellationToken cancellationToken = default)
+        public async Task<int?> DeletarAgendamentoAsync(int id, CancellationToken cancellationToken = default)
         {
             AgendamentoDto? agendamento = await _agendamentoRepository.ObterAgendamentoPorIdAsync(id, cancellationToken);
             if (agendamento is null)
             {
                 _logger.LogError("A pesquisa pelo agendamento no banco não retornou nenhuma linha, deleção incompleta");
-                throw new KeyNotFoundException("Agendamento não encontrado.");
+                return null;
             }
 
             _logger.LogInformation($"O registro no banco foi encontrado e vai ser deletado");

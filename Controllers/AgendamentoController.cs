@@ -21,7 +21,7 @@ namespace GerenciamentoSalas.API.Controllers
         public async Task<IActionResult> ObterPorID([FromRoute] int id, CancellationToken cancellationToken = default)
         {
             AgendamentoDto? agendamento = await _agendamentoService.ObterAgendamentoPorIDAsync(id, cancellationToken);
-            if (agendamento == null ){ return NotFound(); }
+            if (agendamento == null ){ return NotFound($"Agendamento com ID {id} nao encontrado"); }
             else { return Ok(agendamento); }
         }
 
@@ -29,7 +29,7 @@ namespace GerenciamentoSalas.API.Controllers
         public async Task<IActionResult> ObterTodos(CancellationToken cancellationToken = default)
         {
             List<AgendamentoDto> agendamentos = await _agendamentoService.ObterTodosAgendamentoAsync(cancellationToken);
-            if (agendamentos.IsNullOrEmpty()) { return NotFound(); }
+            if (agendamentos.IsNullOrEmpty()) { return NotFound("Nenhum agendamento foi retornado"); }
             else { return Ok(agendamentos); }
         }
 
@@ -53,10 +53,9 @@ namespace GerenciamentoSalas.API.Controllers
         [Route("{id:int}")]
         public async Task<IActionResult> Deletar([FromRoute] int id, CancellationToken cancellationToken = default)
         {
-
-            int idDeletado = await _agendamentoService.DeletarAgendamentoAsync(id, cancellationToken);
-
-            return Ok(idDeletado);
+            int? idDeletado = await _agendamentoService.DeletarAgendamentoAsync(id, cancellationToken);
+            if (idDeletado == null) { return NotFound("O agendamento com ID{id} nao foi encontrado, delecao incompleta"); }
+            else { return Ok(idDeletado); }
         }
     }
 }
