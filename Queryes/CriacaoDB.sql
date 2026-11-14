@@ -74,7 +74,7 @@ PRIMARY KEY CLUSTERED ([Id] ASC)
 GO
 
 -- =============================================
--- 5. TABELA DE AGENDAMENTOS
+-- 5. TABELA DE AGENDAMENTOS 
 -- =============================================
 CREATE TABLE [dbo].[Agendamentos](
 	[Id] [int] IDENTITY(1,1) NOT NULL,
@@ -83,7 +83,7 @@ CREATE TABLE [dbo].[Agendamentos](
 	[SalaId] [int] NOT NULL,
 	[DataHoraInicio] [datetime2](7) NOT NULL,
 	[DataHoraFim] [datetime2](7) NOT NULL,
-	[Status] [varchar](20) NULL CONSTRAINT [DF_Agendamentos_Status] DEFAULT ('Confirmado'),
+	[Status] [int] NULL CONSTRAINT [DF_Agendamentos_Status] DEFAULT ((1)),
 	[Observacoes] [varchar](max) NULL,
 PRIMARY KEY CLUSTERED ([Id] ASC),
 CONSTRAINT [FK_Agendamentos_Pacientes] FOREIGN KEY([PacienteId]) REFERENCES [dbo].[Pacientes] ([Id]),

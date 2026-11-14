@@ -14,7 +14,7 @@ DELETE FROM [dbo].[Responsaveis];
 DELETE FROM [dbo].[Profissionais];
 DELETE FROM [dbo].[Salas];
 
--- Reseta os contadores de Identity para evitar lacunas caso seja necessário
+-- Reseta os contadores de Identity para evitar lacunas
 DBCC CHECKIDENT ('Responsaveis', RESEED, 0);
 DBCC CHECKIDENT ('Pacientes', RESEED, 0);
 DBCC CHECKIDENT ('Profissionais', RESEED, 0);
@@ -103,16 +103,16 @@ SET IDENTITY_INSERT [dbo].[Salas] OFF;
 SET IDENTITY_INSERT [dbo].[Agendamentos] ON;
 
 INSERT INTO [dbo].[Agendamentos] (Id, PacienteId, ProfissionalId, SalaId, DataHoraInicio, DataHoraFim, Status, Observacoes) VALUES 
-(1, 1, 1, 1, '2026-06-15 08:00:00', '2026-06-15 09:00:00', 'Confirmado', 'Consulta mensal de acompanhamento de rotina.'),
-(2, 2, 2, 2, '2026-06-15 09:00:00', '2026-06-15 10:00:00', 'Confirmado', 'Sessão semanal de psicoterapia infantil.'),
-(3, 3, 4, 3, '2026-06-15 10:30:00', '2026-06-15 11:30:00', 'Agendado', 'Avaliação de processamento auditivo central.'),
-(4, 4, 6, 1, '2026-06-15 14:00:00', '2026-06-15 15:30:00', 'Confirmado', 'Sessão de T.O. com foco em regulação sensorial.'),
-(5, 5, 7, 5, '2026-06-16 08:00:00', '2026-06-16 09:00:00', 'Agendado', 'Retorno para entrega de plano alimentar.'),
-(6, 6, 8, 7, '2026-06-16 13:00:00', '2026-06-16 14:00:00', 'Confirmado', 'Atendimento psicopedagógico focado em TDAH.'),
-(7, 7, 9, 9, '2026-06-17 09:00:00', '2026-06-17 10:30:00', 'Pendente', 'Primeira consulta de avaliação neuropediátrica.'),
-(8, 8, 3, 8, '2026-06-17 15:00:00', '2026-06-17 16:00:00', 'Confirmado', 'Sessão de fisioterapia para correção postural.'),
-(9, 9, 2, 2, '2026-06-18 10:00:00', '2026-06-18 11:00:00', 'Cancelado', 'Paciente informou indisponibilidade de transporte.'),
-(10, 1, 4, 3, '2026-06-18 14:00:00', '2026-06-18 15:00:00', 'Agendado', 'Sessão de fonoaudiologia continuada.');
+(1, 1, 1, 1, '2026-06-15 08:00:00', '2026-06-15 09:00:00', 1, 'Consulta mensal de acompanhamento de rotina.'), -- Confirmado
+(2, 2, 2, 2, '2026-06-15 09:00:00', '2026-06-15 10:00:00', 1, 'Sessão semanal de psicoterapia infantil.'), -- Confirmado
+(3, 3, 4, 3, '2026-06-15 10:30:00', '2026-06-15 11:30:00', 0, 'Avaliação de processamento auditivo central.'), -- Agendado
+(4, 4, 6, 1, '2026-06-15 14:00:00', '2026-06-15 15:30:00', 1, 'Sessão de T.O. com foco em regulação sensorial.'), -- Confirmado
+(5, 5, 7, 5, '2026-06-16 08:00:00', '2026-06-16 09:00:00', 0, 'Retorno para entrega de plano alimentar.'), -- Agendado
+(6, 6, 8, 7, '2026-06-16 13:00:00', '2026-06-16 14:00:00', 1, 'Atendimento psicopedagógico focado em TDAH.'), -- Confirmado
+(7, 7, 9, 9, '2026-06-17 09:00:00', '2026-06-17 10:30:00', 2, 'Primeira consulta de avaliação neuropediátrica.'), -- Pendente
+(8, 8, 3, 8, '2026-06-17 15:00:00', '2026-06-17 16:00:00', 1, 'Sessão de fisioterapia para correção postural.'), -- Confirmado
+(9, 9, 2, 2, '2026-06-18 10:00:00', '2026-06-18 11:00:00', 5, 'Paciente informou indisponibilidade de transporte.'), -- Cancelado
+(10, 1, 4, 3, '2026-06-18 14:00:00', '2026-06-18 15:00:00', 0, 'Sessão de fonoaudiologia continuada.'); -- Agendamento
 
 SET IDENTITY_INSERT [dbo].[Agendamentos] OFF;
 
