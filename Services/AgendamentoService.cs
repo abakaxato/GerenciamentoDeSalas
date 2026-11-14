@@ -5,6 +5,7 @@ using GerenciamentoSalas.API.Models.DTOs;
 using GerenciamentoSalas.API.Models.Requests;
 using GerenciamentoSalas.API.Repositories.Interfaces;
 using GerenciamentoSalas.API.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
 namespace GerenciamentoSalas.API.Services
@@ -13,7 +14,7 @@ namespace GerenciamentoSalas.API.Services
     {
         private readonly IAgendamentoRepository _agendamentoRepository;
         private readonly ICommonService _commonService;
-        private readonly ILogger<IAgendamentoService> _logger;
+        private readonly ILogger<AgendamentoService> _logger;
         public AgendamentoService(IAgendamentoRepository agendamentoRepository, ILogger<AgendamentoService> logger, ICommonService commonService)
         {
             _agendamentoRepository = agendamentoRepository;
@@ -48,15 +49,15 @@ namespace GerenciamentoSalas.API.Services
             }
 
             SalaDto sala = new() { Id = request.SalaId};
-            bool salaDisponivel = await _commonService.VerificarDisponibilidade(sala,request.DataHoraInicio,request.DataHoraFim,cancellationToken);
+            bool salaDisponivel = await _commonService.VerificarExistenciaDisponibilidadeAsync(sala,request.DataHoraInicio,request.DataHoraFim, null,cancellationToken);
             if (!salaDisponivel) { throw new DisponibilidadeException(sala, request.DataHoraInicio, request.DataHoraFim, "sala"); }
             
             PacienteDto paciente = new() { Id = request.PacienteId };
-            bool pacienteDisponivel = await _commonService.VerificarDisponibilidade(paciente, request.DataHoraInicio, request.DataHoraFim, cancellationToken);
+            bool pacienteDisponivel = await _commonService.VerificarExistenciaDisponibilidadeAsync(paciente, request.DataHoraInicio, request.DataHoraFim, null, cancellationToken);
             if (!pacienteDisponivel) { throw new DisponibilidadeException(paciente, request.DataHoraInicio, request.DataHoraFim, "paciente"); }
 
             ProfissionalDto profissional = new() { Id = request.ProfissionalId };
-            bool profissionalDisponivel = await _commonService.VerificarDisponibilidade(profissional, request.DataHoraInicio, request.DataHoraFim, cancellationToken);
+            bool profissionalDisponivel = await _commonService.VerificarExistenciaDisponibilidadeAsync(profissional, request.DataHoraInicio, request.DataHoraFim, null, cancellationToken);
             if (!profissionalDisponivel) { throw new DisponibilidadeException(profissional, request.DataHoraInicio, request.DataHoraFim, "profissional"); }
 
             AgendamentoDto agendamento = new()
@@ -67,7 +68,7 @@ namespace GerenciamentoSalas.API.Services
                 DataHoraInicio = request.DataHoraInicio,
                 DataHoraFim = request.DataHoraFim,
                 Observacoes = request.Observacoes,
-                Status = request.Status.ToString().IsNullOrEmpty() ? StatusAgendamentoEnum.Pendente.ToString() : request.Status.ToString()
+                Status = request.Status ?? StatusAgendamentoEnum.Agendado
             };
 
             try
@@ -112,15 +113,15 @@ namespace GerenciamentoSalas.API.Services
                         }
 
                         SalaDto sala = new() { Id = agendamentoBanco.SalaId };
-                        bool salaDisponivel = await _commonService.VerificarDisponibilidade(sala, inicio, fim, cancellationToken);
+                        bool salaDisponivel = await _commonService.VerificarDisponibilidadeAsync(sala, inicio, fim,id, cancellationToken);
                         if (!salaDisponivel) { throw new DisponibilidadeException(sala, inicio, fim, "sala"); }
 
                         PacienteDto paciente = new() { Id = agendamentoBanco.PacienteId };
-                        bool pacienteDisponivel = await _commonService.VerificarDisponibilidade(paciente, inicio, fim, cancellationToken);
+                        bool pacienteDisponivel = await _commonService.VerificarDisponibilidadeAsync(paciente, inicio, fim, id, cancellationToken);
                         if (!pacienteDisponivel) { throw new DisponibilidadeException(paciente, inicio, fim, "paciente"); }
 
                         ProfissionalDto profissional = new() { Id = agendamentoBanco.ProfissionalId };
-                        bool profissionalDisponivel = await _commonService.VerificarDisponibilidade(profissional, inicio, fim, cancellationToken);
+                        bool profissionalDisponivel = await _commonService.VerificarDisponibilidadeAsync(profissional, inicio, fim, id, cancellationToken);
                         if (!profissionalDisponivel) { throw new DisponibilidadeException(profissional, inicio, fim, "profissional"); }
                     }
                 }
@@ -134,6 +135,9 @@ namespace GerenciamentoSalas.API.Services
                     Observacoes = request.Observacoes,
                     Status = request.Status
                 };
+
+                if (String.IsNullOrEmpty(AtualizarAgendamentoDto.Observacoes)) { AtualizarAgendamentoDto.Observacoes = agendamentoBanco.Observacoes; }
+                if (!AtualizarAgendamentoDto.Status.HasValue) { AtualizarAgendamentoDto.Status = agendamentoBanco.Status; }
 
                 AgendamentoDto agendamentoAtualizado = await _agendamentoRepository.AtualizarAgendamentoAsync(AtualizarAgendamentoDto, cancellationToken);
                 return agendamentoAtualizado;

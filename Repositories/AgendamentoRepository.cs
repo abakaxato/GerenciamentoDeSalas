@@ -1,4 +1,5 @@
-﻿using GerenciamentoSalas.API.Models;
+﻿using GerenciamentoSalas.API.Common.Exceptions;
+using GerenciamentoSalas.API.Models;
 using GerenciamentoSalas.API.Models.DTOs;
 using GerenciamentoSalas.API.Models.Requests;
 using GerenciamentoSalas.API.Repositories.Interfaces;
@@ -68,27 +69,32 @@ namespace GerenciamentoSalas.API.Repositories
                 throw;
             }
         }
-        public async Task<AgendamentoDto> AtualizarAgendamentoAsync(AtualizarAgendamentoDto atualizarAgendamento, CancellationToken cancellationToken = default)
+        public async Task<AgendamentoDto> AtualizarAgendamentoAsync(AtualizarAgendamentoDto atualizarAgendamentoDto, CancellationToken cancellationToken = default)
         {
             try
             {
-                var agendamentoBanco = await ObterAgendamentoPorIdAsync(atualizarAgendamento.Id,cancellationToken);
-                if (agendamentoBanco == null) 
+                AgendamentoDto? agendamentoBanco = _dbContext.Agendamentos
+                    .Where(x => x.Id == atualizarAgendamentoDto.Id)
+                    .FirstOrDefault();
+
+                if (agendamentoBanco is not null)
                 {
-                    _logger.LogInformation($"O agendamento com ID {atualizarAgendamento.Id} nao foi encontrado");
-                    throw new KeyNotFoundException($"O agendamento com ID {atualizarAgendamento.Id} nao foi encontrado");
+                    if (atualizarAgendamentoDto.DataHoraInicio.HasValue) { agendamentoBanco.DataHoraInicio = atualizarAgendamentoDto.DataHoraInicio.Value; }
+                    if (atualizarAgendamentoDto.DataHoraFim.HasValue) { agendamentoBanco.DataHoraFim = atualizarAgendamentoDto.DataHoraFim.Value; }
+                    if (!atualizarAgendamentoDto.Observacoes.IsNullOrEmpty()) { agendamentoBanco.Observacoes = atualizarAgendamentoDto.Observacoes; }
+                    if (atualizarAgendamentoDto.Status.HasValue) { agendamentoBanco.Status = atualizarAgendamentoDto.Status.Value; }
+                    await _dbContext.SaveChangesAsync(cancellationToken);
+                    return agendamentoBanco;
                 }
-                if(atualizarAgendamento.DataHoraInicio != null) { agendamentoBanco.DataHoraInicio = atualizarAgendamento.DataHoraInicio.Value; }
-                if(atualizarAgendamento.DataHoraFim != null) { agendamentoBanco.DataHoraFim = atualizarAgendamento.DataHoraFim.Value; }
-                if(!String.IsNullOrEmpty(atualizarAgendamento.Observacoes)) { agendamentoBanco.Observacoes = atualizarAgendamento.Observacoes; }
-                if(atualizarAgendamento.Status.HasValue) { agendamentoBanco.Status = atualizarAgendamento.Status.ToString(); }
-                
-                await _dbContext.SaveChangesAsync(cancellationToken);
-                return agendamentoBanco;
+                else 
+                {
+                    _logger.LogError($"Durante a atualizacao nao foram encontrados agendamentos com o ID {atualizarAgendamentoDto.Id}");
+                    throw new ExistenciaNaTabelaException($"Durante a atualizacao nao foram encontrados agendamentos com o ID {atualizarAgendamentoDto.Id}"); 
+                };
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex,$"Ocorreu um erro ao tentar atualizar o agendamento. {ex.Message}, {atualizarAgendamento.Id}");
+                _logger.LogError(ex,$"Ocorreu um erro ao tentar atualizar o agendamento. {ex.Message}, {atualizarAgendamentoDto.Id}");
                 throw;
             }
         }
