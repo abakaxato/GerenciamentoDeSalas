@@ -1,3 +1,4 @@
+using GerenciamentoSalas.API.Common.Exceptions;
 using GerenciamentoSalas.API.Common.Repositorie;
 using GerenciamentoSalas.API.Common.Repositorie.interfaces;
 using GerenciamentoSalas.API.Common.Service;
@@ -22,6 +23,8 @@ builder.Host.UseSerilog();
 
 //Services
 builder.Services.AddOpenApi();
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
 builder.Services.AddScoped<IAgendamentoService,AgendamentoService>();
 builder.Services.AddScoped<IAgendamentoRepository, AgendamentoRepository>();
 builder.Services.AddScoped<IPacienteService, PacienteService>();
@@ -46,6 +49,8 @@ if (app.Environment.IsDevelopment())
 }
 app.UseDefaultFiles();
 app.UseStaticFiles();
+
+app.UseExceptionHandler();
 
 app.UseHttpsRedirection();
 
