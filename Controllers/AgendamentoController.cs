@@ -33,9 +33,6 @@ namespace GerenciamentoSalas.API.Controllers
         [HttpPost]
         public async Task<IActionResult> Inserir([FromBody] CriarAgendamentoRequest criarAgendamentoRequest, CancellationToken cancellationToken = default)
         {
-            try
-            {
-
                 int idGerado = await  _agendamentoService.InserirAgendamentoAsync(criarAgendamentoRequest, cancellationToken);
 
                 return StatusCode(201, new
@@ -43,55 +40,24 @@ namespace GerenciamentoSalas.API.Controllers
                     Id = idGerado,
                     Mensagem = "Agendamento inserido com sucesso."
                 });
-            }catch(ArgumentException ex)
-            {
-                return StatusCode(404,$"Entidade não registrada para verificar existencia:{ex.Message}");
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Erro ao salvar agendamento: {ex.Message}");
-            }
         }
         [HttpPatch]
         [Route("{id:int}")]
         public async Task<IActionResult> Atualizar([FromRoute] int id,[FromBody]AtualizarAgendamentoRequest atualizarAgendamentoRequest, CancellationToken cancellationToken = default)
         {
-            try
-            {
                 AgendamentoDto agendamentoAtualizado = await _agendamentoService.AtualizarAgendamentoAsync(id,atualizarAgendamentoRequest, cancellationToken);
 
                 return Ok(agendamentoAtualizado);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Erro ao salvar agendamento: {ex.Message}");
-            }
         }
 
         [HttpDelete]
         [Route("{id:int}")]
-        public async Task<IActionResult> Deletar([FromRoute]int id, CancellationToken cancellationToken = default) {
+        public async Task<IActionResult> Deletar([FromRoute] int id, CancellationToken cancellationToken = default)
+        {
 
-            try
-            {
-                int idDeletado = await _agendamentoService.DeletarAgendamentoAsync(id, cancellationToken);
+            int idDeletado = await _agendamentoService.DeletarAgendamentoAsync(id, cancellationToken);
 
-                return StatusCode(200, $"O Agendamento com o ID {idDeletado} foi deletado com sucesso");
-            }
-            catch (InvalidOperationException)
-            {
-                return NotFound($"O Agendamento com ID {id} nao existe");
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(ex.Message);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500,
-                    $"Erro ao deletar agendamento: {ex.Message}");
-            }
-
+            return StatusCode(200, $"O Agendamento com o ID {idDeletado} foi deletado com sucesso");
         }
     }
 }
