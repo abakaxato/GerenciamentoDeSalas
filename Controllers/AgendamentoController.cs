@@ -53,9 +53,8 @@ namespace GerenciamentoSalas.API.Controllers
         [Route("{id:int}")]
         public async Task<IActionResult> Deletar([FromRoute] int id, CancellationToken cancellationToken = default)
         {
-            int? idDeletado = await _agendamentoService.DeletarAgendamentoAsync(id, cancellationToken);
-            if (idDeletado == null) { return NotFound("O agendamento com ID{id} nao foi encontrado, delecao incompleta"); }
-            else { return Ok(idDeletado); }
+            int idDeletado = await _agendamentoService.DeletarAgendamentoAsync(id, cancellationToken);
+            return Ok(idDeletado);
         }
     }
 }
