@@ -15,40 +15,43 @@ namespace GerenciamentoSalas.API.Common.Repositorie
             _logger = logger;
             _dbContext = dbContext;
         }
-        public async Task<bool> VerificarDisponibilidadeAsync<T>(T entidade, DateTime DataInicio, DateTime DataFim, CancellationToken cancellationToken = default)
+        public async Task<bool> VerificarDisponibilidadeAsync<T>(T entidade, DateTime dataInicio, DateTime dataFim, int? agendamentoIdIgnorar = null, CancellationToken cancellationToken = default)
         {
             try
             {
-                bool disponivel = true;
+                bool temConflito = false;
+
                 switch (entidade)
                 {
-                    case (PacienteDto paciente):
-                        List<AgendamentoDto> registrosPaciente = await _dbContext.Agendamentos.
-                            Where(x => x.PacienteId == paciente.Id)
-                            .Where(x => x.DataHoraInicio < DataFim && x.DataHoraFim > DataInicio)
-                            .ToListAsync(cancellationToken);
-                        if (!registrosPaciente.IsNullOrEmpty()) { disponivel = false; }
+                    case PacienteDto paciente:
+                        temConflito = await _dbContext.Agendamentos
+                            .AnyAsync(x => x.PacienteId == paciente.Id
+                                        && (!agendamentoIdIgnorar.HasValue || x.Id != agendamentoIdIgnorar.Value)
+                                        && x.DataHoraInicio < dataFim
+                                        && x.DataHoraFim > dataInicio, cancellationToken);
                         break;
-                    case (SalaDto sala):
-                        List<AgendamentoDto> registrosSala = await _dbContext.Agendamentos.
-                            Where(x => x.SalaId == sala.Id)
-                            .Where(x => x.DataHoraInicio < DataFim && x.DataHoraFim > DataInicio)
-                            .ToListAsync(cancellationToken);
-                        if (!registrosSala.IsNullOrEmpty()) { disponivel = false; }
+
+                    case SalaDto sala:
+                        temConflito = await _dbContext.Agendamentos
+                            .AnyAsync(x => x.SalaId == sala.Id
+                                        && (!agendamentoIdIgnorar.HasValue || x.Id != agendamentoIdIgnorar.Value)
+                                        && x.DataHoraInicio < dataFim
+                                        && x.DataHoraFim > dataInicio, cancellationToken);
                         break;
-                    case (ProfissionalDto profissional):
-                        List<AgendamentoDto> registrosProfissional = await _dbContext.Agendamentos.
-                            Where(x => x.ProfissionalId == profissional.Id)
-                            .Where(x => x.DataHoraInicio < DataFim && x.DataHoraFim > DataInicio)
-                            .ToListAsync(cancellationToken);
-                        if (!registrosProfissional.IsNullOrEmpty()) { disponivel = false; }
+
+                    case ProfissionalDto profissional:
+                        temConflito = await _dbContext.Agendamentos
+                            .AnyAsync(x => x.ProfissionalId == profissional.Id
+                                        && (!agendamentoIdIgnorar.HasValue || x.Id != agendamentoIdIgnorar.Value)
+                                        && x.DataHoraInicio < dataFim
+                                        && x.DataHoraFim > dataInicio, cancellationToken);
                         break;
+
                     default:
-                        disponivel = false;
                         _logger.LogError("Entidade não reconhecida para verificar disponibilidade");
                         throw new ArgumentException("Entidade não reconhecida para verificar disponibilidade");
                 }
-                return disponivel;
+                return !temConflito;
             }
             catch (Exception ex)
             {
@@ -56,7 +59,7 @@ namespace GerenciamentoSalas.API.Common.Repositorie
                 throw;
             }
         }
-        public async Task<bool> VerificarExistencia<T>(T entidade, CancellationToken cancellationToken = default)
+        public async Task<bool> VerificarExistenciaAsync<T>(T entidade, CancellationToken cancellationToken = default)
         {
             try
             {
@@ -64,27 +67,27 @@ namespace GerenciamentoSalas.API.Common.Repositorie
                 switch (entidade)
                 {
                     case (PacienteDto paciente):
-                        List<AgendamentoDto> registrosPaciente = await _dbContext.Agendamentos.
-                            Where(x => x.PacienteId == paciente.Id)
+                        List<PacienteDto> registrosPaciente = await _dbContext.Pacientes.
+                            Where(x => x.Id == paciente.Id)
                             .ToListAsync(cancellationToken);
                         if (!registrosPaciente.IsNullOrEmpty()) { disponivel = false; }
                         break;
                     case (SalaDto sala):
-                        List<AgendamentoDto> registrosSala = await _dbContext.Agendamentos.
-                            Where(x => x.SalaId == sala.Id)
+                        List<SalaDto> registrosSala = await _dbContext.Salas.
+                            Where(x => x.Id == sala.Id)
                             .ToListAsync(cancellationToken);
                         if (!registrosSala.IsNullOrEmpty()) { disponivel = false; }
                         break;
                     case (ProfissionalDto profissional):
-                        List<AgendamentoDto> registrosProfissional = await _dbContext.Agendamentos.
-                            Where(x => x.ProfissionalId == profissional.Id)
+                        List<ProfissionalDto> registrosProfissional = await _dbContext.Profissionais.
+                            Where(x => x.Id == profissional.Id)
                             .ToListAsync(cancellationToken);
                         if (!registrosProfissional.IsNullOrEmpty()) { disponivel = false; }
                         break;
                     default:
-                        _logger.LogError("Entidade não reconhecida para verificar disponibilidade");
                         disponivel = false;
-                        break;
+                        _logger.LogError("Entidade não registrada para verificar existencia");
+                        throw new ArgumentException("Entidade não registrada para verificar existencia");
                 }
                 return disponivel;
             }

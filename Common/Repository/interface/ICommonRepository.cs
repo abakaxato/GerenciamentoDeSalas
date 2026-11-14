@@ -4,7 +4,7 @@ namespace GerenciamentoSalas.API.Common.Repositorie.interfaces
 {
     public interface ICommonRepository
     {
-        public Task<bool> VerificarDisponibilidadeAsync<T>(T entidade, DateTime DataInicio, DateTime DataFim, CancellationToken cancellationToken = default);
-        public Task<bool> VerificarExistencia<T>(T entidade, CancellationToken cancellationToken = default);
+        public Task<bool> VerificarDisponibilidadeAsync<T>(T entidade, DateTime dataInicio, DateTime dataFim, int? agendamentoIdIgnorar = null, CancellationToken cancellationToken = default);
+        public Task<bool> VerificarExistenciaAsync<T>(T entidade, CancellationToken cancellationToken = default);
     }
 }
