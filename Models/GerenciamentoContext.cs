@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using GerenciamentoSalas.API.Enums;
 using GerenciamentoSalas.API.Models.DTOs;
 using Microsoft.EntityFrameworkCore;
 
@@ -40,7 +41,7 @@ public partial class GerenciamentoContext : DbContext
             entity.Property(e => e.Status)
                 .HasMaxLength(20)
                 .IsUnicode(false)
-                .HasDefaultValue("Confirmado", "DF_Agendamentos_Status");
+                .HasDefaultValue(StatusAgendamentoEnum.Agendado, "DF_Agendamentos_Status");
 
             entity.HasOne(d => d.Paciente).WithMany(p => p.Agendamentos)
                 .HasForeignKey(d => d.PacienteId)

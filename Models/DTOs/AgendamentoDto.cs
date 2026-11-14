@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GerenciamentoSalas.API.Enums;
+using System;
 using System.Collections.Generic;
 
 namespace GerenciamentoSalas.API.Models.DTOs;
@@ -17,7 +18,7 @@ public partial class AgendamentoDto
 
     public DateTime DataHoraFim { get; set; }
 
-    public string? Status { get; set; }
+    public StatusAgendamentoEnum Status { get; set; }
 
     public string? Observacoes { get; set; }
 
