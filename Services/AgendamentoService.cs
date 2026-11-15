@@ -24,22 +24,15 @@ namespace GerenciamentoSalas.API.Services
         {
             if (id <= 0) { throw new ArgumentException("ID Menor ou igual a zero"); }
 
-            _logger.LogInformation($"Busca por agendamento {id} iniciada");
-
             AgendamentoDto? agendamento = await _agendamentoRepository.ObterAgendamentoPorIdAsync(id, cancellationToken);
-
-            _logger.LogInformation($"Busca por agendamento {id} finalizada");
 
             return agendamento;
         }
 
         public async Task<List<AgendamentoDto>> ObterTodosAgendamentoAsync(CancellationToken cancellationToken = default)
         {
-            _logger.LogInformation($"Busca por todos os agendamentos iniciada");
 
             List<AgendamentoDto> agendamentos = await _agendamentoRepository.ObterTodosAgendamentoAsync(cancellationToken);
-
-            _logger.LogInformation($"Busca por todos os agendamentos finalizada");
 
             return agendamentos;
         }
