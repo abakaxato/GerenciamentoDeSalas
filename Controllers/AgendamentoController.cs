@@ -8,13 +8,9 @@ namespace GerenciamentoSalas.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class AgendamentoController : ControllerBase
+    public class AgendamentoController(IAgendamentoService agendamentoService) : ControllerBase
     {
-        private readonly IAgendamentoService _agendamentoService;
-        public AgendamentoController(IAgendamentoService agendamentoService)
-        {
-            _agendamentoService = agendamentoService;
-        }
+        private readonly IAgendamentoService _agendamentoService = agendamentoService;
 
         [HttpGet]
         [Route("{id:int}")]
