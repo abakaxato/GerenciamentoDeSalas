@@ -10,6 +10,6 @@ namespace GerenciamentoSalas.API.Models.Requests
         public required DateTime DataHoraInicio { get; set; }
         public required DateTime DataHoraFim { get; set; }
         public string? Observacoes { get; set; }
-        public StatusAgendamentoEnum? Status { get; set; } = StatusAgendamentoEnum.Agendado;
+        public StatusAgendamentoEnum? Status { get; set; } = StatusAgendamentoEnum.Pendente;
     }
 }
