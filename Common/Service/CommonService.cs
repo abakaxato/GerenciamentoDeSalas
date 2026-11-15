@@ -10,7 +10,6 @@ namespace GerenciamentoSalas.API.Common.Service
         private readonly ILogger<ICommonService> _logger;
         public CommonService(ICommonRepository commonRepository, ILogger<ICommonService> logger)
         {
-
             _commonRepository = commonRepository;
             _logger = logger;
         }
@@ -28,7 +27,6 @@ namespace GerenciamentoSalas.API.Common.Service
         }
         public async Task<bool> VerificarExistenciaDisponibilidadeAsync<T>(T entidade, DateTime DataInicio, DateTime DataFim, int? agendamentoIdIgnorar = null, CancellationToken cancellationToken = default)
         {
-
             bool existe = await VerificarExistenciaAsync(entidade, cancellationToken);
             bool disponivel = await VerificarDisponibilidadeAsync(entidade, DataInicio, DataFim, agendamentoIdIgnorar, cancellationToken);
 
@@ -37,7 +35,11 @@ namespace GerenciamentoSalas.API.Common.Service
                 return true;
             }
             else return false;
-
+        }
+        public async Task<bool> VerficarAgendamentosAtivos<T>(T entidade, CancellationToken cancellationToken = default)
+        {
+            bool existe = await _commonRepository.VerficarAgendamentosAtivos(entidade,cancellationToken);
+            return existe;
         }
     }
 }

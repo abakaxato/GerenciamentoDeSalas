@@ -28,7 +28,6 @@ namespace GerenciamentoSalas.API.Common.Repositorie
                                     && x.DataHoraInicio < dataFim
                                     && x.DataHoraFim > dataInicio, cancellationToken);
                     break;
-
                 case SalaDto sala:
                     temConflito = await _dbContext.Agendamentos
                         .AnyAsync(x => x.SalaId == sala.Id
@@ -36,7 +35,6 @@ namespace GerenciamentoSalas.API.Common.Repositorie
                                     && x.DataHoraInicio < dataFim
                                     && x.DataHoraFim > dataInicio, cancellationToken);
                     break;
-
                 case ProfissionalDto profissional:
                     temConflito = await _dbContext.Agendamentos
                         .AnyAsync(x => x.ProfissionalId == profissional.Id
@@ -44,7 +42,6 @@ namespace GerenciamentoSalas.API.Common.Repositorie
                                     && x.DataHoraInicio < dataFim
                                     && x.DataHoraFim > dataInicio, cancellationToken);
                     break;
-
                 default:
                     _logger.LogError("Entidade não reconhecida para verificar disponibilidade");
                     throw new ArgumentException("Entidade não reconhecida para verificar disponibilidade");
@@ -78,6 +75,30 @@ namespace GerenciamentoSalas.API.Common.Repositorie
                     existe = false;
                     _logger.LogError("Entidade não registrada para verificar existencia");
                     throw new ArgumentException("Entidade não registrada para verificar existencia");
+            }
+            return existe;
+        }
+
+        public async Task<bool> VerficarAgendamentosAtivos<T>(T entidade, CancellationToken cancellationToken = default)
+        {
+            bool existe = false;
+            switch (entidade)
+            {
+                case PacienteDto paciente:
+                    existe = await _dbContext.Agendamentos
+                        .AnyAsync(x => x.PacienteId == paciente.Id && x.Status != Enums.StatusAgendamentoEnum.Pendente, cancellationToken);
+                    break;
+                case SalaDto sala:
+                    existe = await _dbContext.Agendamentos
+                        .AnyAsync(x => x.SalaId == sala.Id && x.Status != Enums.StatusAgendamentoEnum.Pendente, cancellationToken);
+                    break;
+                case ProfissionalDto profissional:
+                    existe = await _dbContext.Agendamentos
+                        .AnyAsync(x => x.ProfissionalId == profissional.Id && x.Status != Enums.StatusAgendamentoEnum.Pendente, cancellationToken);
+                    break;
+                default:
+                    _logger.LogError("Entidade não reconhecida para verificar agendamentos ativos");
+                    throw new ArgumentException("Entidade não reconhecida para verificar agendamentos ativos");
             }
             return existe;
         }
