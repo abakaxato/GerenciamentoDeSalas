@@ -1,4 +1,4 @@
-﻿namespace GerenciamentoSalas.API.Common.Repositorie.interfaces
+﻿namespace GerenciamentoSalas.API.Common.Repository.interfaces
 {
     public interface ICommonRepository
     {

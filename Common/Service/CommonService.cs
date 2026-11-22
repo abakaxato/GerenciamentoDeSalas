@@ -1,4 +1,4 @@
-﻿using GerenciamentoSalas.API.Common.Repositorie.interfaces;
+﻿using GerenciamentoSalas.API.Common.Repository.interfaces;
 using GerenciamentoSalas.API.Common.Service.Interface;
 
 namespace GerenciamentoSalas.API.Common.Service

@@ -3,11 +3,11 @@ using Microsoft.Data.SqlClient;
 
 namespace GerenciamentoSalas.API.Repositories
 {
-    public class ProfissionaisRepository
+    public class ProfissionalRepository
     {
         private readonly string _connectionString;
 
-        public ProfissionaisRepository(IConfiguration configuration)
+        public ProfissionalRepository(IConfiguration configuration)
         {
             _connectionString = configuration.GetConnectionString("ConexaoPadrao")
                 ?? throw new ArgumentNullException("String de conexão não encontrada.");

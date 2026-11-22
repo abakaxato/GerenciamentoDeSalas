@@ -1,6 +1,6 @@
 using GerenciamentoSalas.API.Common;
-using GerenciamentoSalas.API.Common.Repositorie;
-using GerenciamentoSalas.API.Common.Repositorie.interfaces;
+using GerenciamentoSalas.API.Common.Repository;
+using GerenciamentoSalas.API.Common.Repository.interfaces;
 using GerenciamentoSalas.API.Common.Service;
 using GerenciamentoSalas.API.Common.Service.Interface;
 using GerenciamentoSalas.API.Models;

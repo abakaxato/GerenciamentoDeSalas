@@ -1,9 +1,9 @@
-﻿using GerenciamentoSalas.API.Common.Repositorie.interfaces;
+﻿using GerenciamentoSalas.API.Common.Repository.interfaces;
 using GerenciamentoSalas.API.Models;
 using GerenciamentoSalas.API.Models.DTOs;
 using Microsoft.EntityFrameworkCore;
 
-namespace GerenciamentoSalas.API.Common.Repositorie
+namespace GerenciamentoSalas.API.Common.Repository
 {
     public class CommonRepository : ICommonRepository
     {
