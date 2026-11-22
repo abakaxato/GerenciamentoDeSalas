@@ -2,8 +2,8 @@
 {
     public class CriarPacienteRequest
     {
-        public int ResponsavelId { get; set; }
-        public string Nome { get; set; } = string.Empty;
-        public DateTime? DataNascimento { get; set; }
+        public int? ResponsavelId { get; set; }
+        public required string Nome { get; set; } = string.Empty;
+        public required DateTime DataNascimento { get; set; }
     }
 }
