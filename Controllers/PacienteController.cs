@@ -1,6 +1,5 @@
 ﻿using GerenciamentoSalas.API.Models.DTOs;
 using GerenciamentoSalas.API.Models.Requests;
-using GerenciamentoSalas.API.Services;
 using GerenciamentoSalas.API.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 

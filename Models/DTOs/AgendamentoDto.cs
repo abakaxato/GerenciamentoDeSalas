@@ -19,7 +19,7 @@ public partial class AgendamentoDto
     public StatusAgendamentoEnum Status { get; set; }
 
     public string? Observacoes { get; set; }
-    
+
     public bool Ativo { get; set; } = true;
 
     public virtual PacienteDto Paciente { get; set; } = null!;

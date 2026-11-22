@@ -64,8 +64,8 @@ namespace GerenciamentoSalas.API.Repositories
         }
         public async Task<int> DeletarAgendamentoAsync(AgendamentoDto agendamento, CancellationToken cancellationToken = default)
         {
-            AgendamentoDto agendamentoDeletado = await _dbContext.Agendamentos.FirstAsync(x => x.Id == agendamento.Id,cancellationToken);
-            
+            AgendamentoDto agendamentoDeletado = await _dbContext.Agendamentos.FirstAsync(x => x.Id == agendamento.Id, cancellationToken);
+
             agendamentoDeletado.Ativo = false;
 
             await _dbContext.SaveChangesAsync(cancellationToken);

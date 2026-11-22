@@ -22,7 +22,7 @@ namespace GerenciamentoSalas.API.Common.Repositorie
             {
                 case (PacienteDto paciente):
                     temConflito = await _dbContext.Agendamentos
-                        .AnyAsync(x => x.Ativo == true 
+                        .AnyAsync(x => x.Ativo == true
                                     && x.PacienteId == paciente.Id
                                     && (!agendamentoIdIgnorar.HasValue || x.Id != agendamentoIdIgnorar.Value)
                                     && x.DataHoraInicio < dataFim

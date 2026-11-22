@@ -85,11 +85,11 @@ namespace GerenciamentoSalas.API.Repositories
             int agendamentosDeletados = await _dbContext.Agendamentos
              .Where(x => x.Ativo == true && x.PacienteId == paciente.Id)
              .ExecuteUpdateAsync(setters => setters
-             .SetProperty(a => a.Ativo, false),cancellationToken);
+             .SetProperty(a => a.Ativo, false), cancellationToken);
 
-            PacienteDto? pacienteDeletado = await _dbContext.Pacientes.FirstOrDefaultAsync(x => x.Id == paciente.Id,cancellationToken) 
+            PacienteDto? pacienteDeletado = await _dbContext.Pacientes.FirstOrDefaultAsync(x => x.Id == paciente.Id, cancellationToken)
                 ?? throw new KeyNotFoundException("Paciente não encontrado no banco");
-            
+
             pacienteDeletado.Ativo = false;
 
             await _dbContext.SaveChangesAsync(cancellationToken);

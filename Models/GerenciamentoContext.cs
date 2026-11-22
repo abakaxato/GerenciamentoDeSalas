@@ -34,7 +34,7 @@ public partial class GerenciamentoContext : DbContext
             entity.HasIndex(e => e.DataHoraInicio, "IX_Agendamentos_DataHoraInicio");
 
             entity.HasIndex(e => e.Status, "IX_Agendamentos_Status");
-            
+
             entity.Property(e => e.Ativo).HasDefaultValue(true);
             entity.Property(e => e.Observacoes).IsUnicode(false);
             entity.Property(e => e.Status)

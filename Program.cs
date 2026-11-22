@@ -8,10 +8,10 @@ using GerenciamentoSalas.API.Repositories;
 using GerenciamentoSalas.API.Repositories.Interfaces;
 using GerenciamentoSalas.API.Services;
 using GerenciamentoSalas.API.Services.Interfaces;
-using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 using Serilog;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
