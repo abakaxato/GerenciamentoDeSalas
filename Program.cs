@@ -1,4 +1,4 @@
-using GerenciamentoSalas.API.Common.Exceptions;
+using GerenciamentoSalas.API.Common;
 using GerenciamentoSalas.API.Common.Repositorie;
 using GerenciamentoSalas.API.Common.Repositorie.interfaces;
 using GerenciamentoSalas.API.Common.Service;
@@ -8,6 +8,7 @@ using GerenciamentoSalas.API.Repositories;
 using GerenciamentoSalas.API.Repositories.Interfaces;
 using GerenciamentoSalas.API.Services;
 using GerenciamentoSalas.API.Services.Interfaces;
+using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 using Serilog;
@@ -31,7 +32,7 @@ builder.Services.AddScoped<IPacienteService, PacienteService>();
 builder.Services.AddScoped<IPacienteRepository, PacienteRepository>();
 builder.Services.AddScoped<ICommonService, CommonService>();
 builder.Services.AddScoped<ICommonRepository, CommonRepository>();
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(options => options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 builder.Services.AddDbContext<GerenciamentoContext>(opts => opts.UseSqlServer(builder.Configuration.GetConnectionString("ConexaoPadrao")));
 
 var app = builder.Build();
