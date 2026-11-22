@@ -2,7 +2,6 @@
 using GerenciamentoSalas.API.Models;
 using GerenciamentoSalas.API.Models.DTOs;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 
 namespace GerenciamentoSalas.API.Common.Repositorie
 {
@@ -21,23 +20,26 @@ namespace GerenciamentoSalas.API.Common.Repositorie
 
             switch (entidade)
             {
-                case PacienteDto paciente:
+                case (PacienteDto paciente):
                     temConflito = await _dbContext.Agendamentos
-                        .AnyAsync(x => x.PacienteId == paciente.Id
+                        .AnyAsync(x => x.Ativo == true 
+                                    && x.PacienteId == paciente.Id
                                     && (!agendamentoIdIgnorar.HasValue || x.Id != agendamentoIdIgnorar.Value)
                                     && x.DataHoraInicio < dataFim
                                     && x.DataHoraFim > dataInicio, cancellationToken);
                     break;
-                case SalaDto sala:
+                case (SalaDto sala):
                     temConflito = await _dbContext.Agendamentos
-                        .AnyAsync(x => x.SalaId == sala.Id
+                        .AnyAsync(x => x.Ativo == true
+                                    && x.SalaId == sala.Id
                                     && (!agendamentoIdIgnorar.HasValue || x.Id != agendamentoIdIgnorar.Value)
                                     && x.DataHoraInicio < dataFim
                                     && x.DataHoraFim > dataInicio, cancellationToken);
                     break;
-                case ProfissionalDto profissional:
+                case (ProfissionalDto profissional):
                     temConflito = await _dbContext.Agendamentos
-                        .AnyAsync(x => x.ProfissionalId == profissional.Id
+                        .AnyAsync(x => x.Ativo == true
+                                    && x.ProfissionalId == profissional.Id
                                     && (!agendamentoIdIgnorar.HasValue || x.Id != agendamentoIdIgnorar.Value)
                                     && x.DataHoraInicio < dataFim
                                     && x.DataHoraFim > dataInicio, cancellationToken);
@@ -54,22 +56,16 @@ namespace GerenciamentoSalas.API.Common.Repositorie
             switch (entidade)
             {
                 case (PacienteDto paciente):
-                    List<PacienteDto> registrosPaciente = await _dbContext.Pacientes.
-                        Where(x => x.Id == paciente.Id)
-                        .ToListAsync(cancellationToken);
-                    if (registrosPaciente.IsNullOrEmpty()) { existe = false; }
+                    existe = await _dbContext.Pacientes.AnyAsync(x => x.Ativo == true && x.Id == paciente.Id, cancellationToken);
                     break;
                 case (SalaDto sala):
-                    List<SalaDto> registrosSala = await _dbContext.Salas.
-                        Where(x => x.Id == sala.Id)
-                        .ToListAsync(cancellationToken);
-                    if (registrosSala.IsNullOrEmpty()) { existe = false; }
+                    existe = await _dbContext.Salas.AnyAsync(x => x.Ativo == true && x.Id == sala.Id, cancellationToken);
                     break;
                 case (ProfissionalDto profissional):
-                    List<ProfissionalDto> registrosProfissional = await _dbContext.Profissionais.
-                        Where(x => x.Id == profissional.Id)
-                        .ToListAsync(cancellationToken);
-                    if (registrosProfissional.IsNullOrEmpty()) { existe = false; }
+                    existe = await _dbContext.Profissionais.AnyAsync(x => x.Ativo == true && x.Id == profissional.Id, cancellationToken);
+                    break;
+                case (ResponsavelDto responsavel):
+                    existe = await _dbContext.Responsaveis.AnyAsync(x => x.Ativo == true && x.Id == responsavel.Id, cancellationToken);
                     break;
                 default:
                     existe = false;
@@ -84,17 +80,21 @@ namespace GerenciamentoSalas.API.Common.Repositorie
             bool existe = false;
             switch (entidade)
             {
-                case PacienteDto paciente:
+                case (PacienteDto paciente):
                     existe = await _dbContext.Agendamentos
-                        .AnyAsync(x => x.PacienteId == paciente.Id && x.Status != Enums.StatusAgendamentoEnum.Pendente, cancellationToken);
+                        .AnyAsync(x => x.Ativo == true && x.PacienteId == paciente.Id && x.Status != Enums.StatusAgendamentoEnum.Pendente, cancellationToken);
                     break;
-                case SalaDto sala:
+                case (SalaDto sala):
                     existe = await _dbContext.Agendamentos
-                        .AnyAsync(x => x.SalaId == sala.Id && x.Status != Enums.StatusAgendamentoEnum.Pendente, cancellationToken);
+                        .AnyAsync(x => x.Ativo == true && x.SalaId == sala.Id && x.Status != Enums.StatusAgendamentoEnum.Pendente, cancellationToken);
                     break;
-                case ProfissionalDto profissional:
+                case (ProfissionalDto profissional):
                     existe = await _dbContext.Agendamentos
-                        .AnyAsync(x => x.ProfissionalId == profissional.Id && x.Status != Enums.StatusAgendamentoEnum.Pendente, cancellationToken);
+                        .AnyAsync(x => x.Ativo == true && x.ProfissionalId == profissional.Id && x.Status != Enums.StatusAgendamentoEnum.Pendente, cancellationToken);
+                    break;
+                case ResponsavelDto responsavel:
+                    existe = await _dbContext.Agendamentos
+                        .AnyAsync(x => x.Ativo == true && x.Paciente != null && x.Paciente.ResponsavelId == responsavel.Id && x.Status != Enums.StatusAgendamentoEnum.Pendente, cancellationToken);
                     break;
                 default:
                     _logger.LogError("Entidade não reconhecida para verificar agendamentos ativos");
