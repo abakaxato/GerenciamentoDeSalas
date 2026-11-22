@@ -7,6 +7,7 @@ public partial class SalaDto
     public string Nome { get; set; } = null!;
 
     public int? Capacidade { get; set; }
+    public bool Ativo { get; set; } = true;
 
     public virtual ICollection<AgendamentoDto> Agendamentos { get; set; } = new List<AgendamentoDto>();
     public override string ToString()

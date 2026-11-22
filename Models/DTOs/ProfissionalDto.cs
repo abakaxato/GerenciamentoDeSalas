@@ -10,7 +10,7 @@ public partial class ProfissionalDto
 
     public string? Telefone { get; set; }
 
-    public bool? Ativo { get; set; }
+    public bool Ativo { get; set; }
 
     public virtual ICollection<AgendamentoDto> Agendamentos { get; set; } = new List<AgendamentoDto>();
     public override string ToString()

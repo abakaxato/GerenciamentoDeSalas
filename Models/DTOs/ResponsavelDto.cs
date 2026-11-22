@@ -11,6 +11,8 @@ public partial class ResponsavelDto
     public string? Email { get; set; }
 
     public DateTime DataCadastro { get; set; }
+    
+    public bool Ativo { get; set; } = true;
 
     public virtual ICollection<PacienteDto> Pacientes { get; set; } = new List<PacienteDto>();
     public override string ToString()

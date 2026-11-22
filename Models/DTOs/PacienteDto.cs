@@ -4,13 +4,15 @@ public partial class PacienteDto
 {
     public int Id { get; set; }
 
-    public int ResponsavelId { get; set; }
+    public int? ResponsavelId { get; set; }
 
     public string Nome { get; set; } = null!;
 
     public DateTime? DataNascimento { get; set; }
 
-    public DateTime DataCadastro { get; set; }
+    public DateTime DataCadastro { get; set; } = DateTime.Now;
+
+    public bool Ativo { get; set; } = true;
 
     public virtual ICollection<AgendamentoDto> Agendamentos { get; set; } = new List<AgendamentoDto>();
 
