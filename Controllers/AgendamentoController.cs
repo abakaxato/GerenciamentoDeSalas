@@ -2,7 +2,6 @@
 using GerenciamentoSalas.API.Models.Requests;
 using GerenciamentoSalas.API.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
 
 namespace GerenciamentoSalas.API.Controllers
 {
