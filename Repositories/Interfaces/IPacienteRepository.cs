@@ -7,6 +7,7 @@ namespace GerenciamentoSalas.API.Repositories.Interfaces
         public Task<PacienteDto?> ObterPacientePorIdAsync(int id, CancellationToken cancellationToken = default);
         public Task<List<PacienteDto>> ObterTodosPacienteAsync(CancellationToken cancellationToken = default);
         public Task<int> InserirPacienteAsync(PacienteDto paciente, CancellationToken cancellationToken = default);
-        public Task<int> DeletarPacienteAsync(PacienteDto paciente, CancellationToken cancellationToken = default);
+        public Task<PacienteDto?> AtualizarPacienteAsync(AtualizarPacienteDto atualizarPacienteDto, CancellationToken cancellationToken = default);
+        public Task<(int agendamentosDeletados, int PacienteId)> DeletarPacienteAsync(PacienteDto paciente, CancellationToken cancellationToken = default);
     }
 }

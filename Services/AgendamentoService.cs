@@ -135,7 +135,7 @@ namespace GerenciamentoSalas.API.Services
             if (!AtualizarAgendamentoDto.Status.HasValue) { AtualizarAgendamentoDto.Status = agendamentoBanco.Status; }
 
             AgendamentoDto? agendamentoAtualizado = await _agendamentoRepository.AtualizarAgendamentoAsync(AtualizarAgendamentoDto, cancellationToken)
-                ?? throw new ExistenciaNaTabelaException($"Durante a atualizacao nao foram encontrados agendamentos com o ID {AtualizarAgendamentoDto.Id}");
+                ?? throw new KeyNotFoundException($"Durante a atualizacao nao foram encontrados agendamentos com o ID {AtualizarAgendamentoDto.Id}");
 
             return agendamentoAtualizado;
         }

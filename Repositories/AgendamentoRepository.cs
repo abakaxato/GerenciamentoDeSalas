@@ -19,13 +19,15 @@ namespace GerenciamentoSalas.API.Repositories
 
         public async Task<AgendamentoDto?> ObterAgendamentoPorIdAsync(int id, CancellationToken cancellationToken = default)
         {
-            AgendamentoDto? agendamento = await _dbContext.Agendamentos.FirstOrDefaultAsync(x => x.Id == id,cancellationToken);
+            AgendamentoDto? agendamento = await _dbContext.Agendamentos
+                .FirstOrDefaultAsync(x => x.Id == id && x.Ativo == true, cancellationToken);
 
             return agendamento;
         }
         public async Task<List<AgendamentoDto>> ObterTodosAgendamentoAsync(CancellationToken cancellationToken = default)
         {
-            List<AgendamentoDto> agendamentos = await _dbContext.Agendamentos.ToListAsync(cancellationToken);
+            List<AgendamentoDto> agendamentos = await _dbContext.Agendamentos
+                .Where(x => x.Ativo == true).ToListAsync(cancellationToken);
 
             return agendamentos;
         }
@@ -41,7 +43,7 @@ namespace GerenciamentoSalas.API.Repositories
         public async Task<AgendamentoDto?> AtualizarAgendamentoAsync(AtualizarAgendamentoDto atualizarAgendamentoDto, CancellationToken cancellationToken = default)
         {
 
-            AgendamentoDto? agendamentoBanco = await _dbContext.Agendamentos.FirstOrDefaultAsync(x => x.Id == atualizarAgendamentoDto.Id,cancellationToken);
+            AgendamentoDto? agendamentoBanco = await _dbContext.Agendamentos.FirstOrDefaultAsync(x => x.Id == atualizarAgendamentoDto.Id, cancellationToken);
 
             if (agendamentoBanco is not null)
             {
@@ -56,18 +58,19 @@ namespace GerenciamentoSalas.API.Repositories
             }
             else
             {
-                _logger.LogError($"Durante a atualizacao nao foram encontrados agendamentos com o ID {atualizarAgendamentoDto.Id}");
+                _logger.LogError("Durante a atualizacao nao foram encontrados agendamentos com o ID {atualizarAgendamentoDtoId}", atualizarAgendamentoDto.Id);
                 return null;
-            }
-            ;
+            };
         }
         public async Task<int> DeletarAgendamentoAsync(AgendamentoDto agendamento, CancellationToken cancellationToken = default)
         {
-            _dbContext.Agendamentos.Remove(agendamento);
+            AgendamentoDto agendamentoDeletado = await _dbContext.Agendamentos.FirstAsync(x => x.Id == agendamento.Id,cancellationToken);
+            
+            agendamentoDeletado.Ativo = false;
 
             await _dbContext.SaveChangesAsync(cancellationToken);
 
-            return agendamento.Id;
+            return agendamentoDeletado.Id;
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using GerenciamentoSalas.API.Models.DTOs;
 using GerenciamentoSalas.API.Models.Requests;
-using GerenciamentoSalas.API.Repositories;
+using GerenciamentoSalas.API.Services;
 using GerenciamentoSalas.API.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,90 +8,53 @@ namespace GerenciamentoSalas.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class PacienteController : ControllerBase
+    public class PacienteController(IPacienteService pacienteService) : ControllerBase
     {
-        private readonly PacienteRepository _PacienteRepository;
-        private readonly IPacienteService _PacienteService;
-
-        public PacienteController(IConfiguration configuration, IPacienteService pacienteService)
+        private readonly IPacienteService _pacienteService = pacienteService;
+        [HttpGet]
+        [Route("{id:int}")]
+        public async Task<IActionResult> ObterPorID([FromRoute] int id, CancellationToken cancellationToken = default)
         {
-            _PacienteRepository = new PacienteRepository(configuration);
-            _PacienteService = pacienteService;
+            PacienteDto? paciente = await _pacienteService.ObterPacientePorIdAsync(id, cancellationToken);
+            if (paciente == null) { return NotFound($"Paciente com ID {id} não encontrado"); }
+            else { return Ok(paciente); }
         }
 
         [HttpGet]
-        [Route("VerificarDisponibilidade")]
-        public async Task<IActionResult> VerificarDisponibilidade([FromQuery] int id, [FromQuery] DateTime dataInicio, DateTime dataFim)
+        public async Task<IActionResult> ObterTodos(CancellationToken cancellationToken = default)
         {
-            try
-            {
-                bool disponibilidade = await _PacienteService.VerificarDisponibilidadeAsync(id, dataInicio, dataFim);
-                return Ok(disponibilidade);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Erro Interno no servidor{ex.Message}");
-            }
-        }
-
-        [HttpGet]
-        [Route("api/[controller]")]
-        public IActionResult ObterTodos()
-        {
-            try
-            {
-                var pacientes = _PacienteRepository.ObterTodosPaciente();
-                return Ok(pacientes);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Erro Interno no servidor{ex.Message}");
-            }
+            List<PacienteDto> pacientes = await _pacienteService.ObterTodosPacienteAsync(cancellationToken);
+            return Ok(pacientes);
         }
 
         [HttpPost]
-        [Route("api/[controller]")]
-        public IActionResult Inserir([FromBody] CriarPacienteRequest request)
+        public async Task<IActionResult> Inserir([FromBody] CriarPacienteRequest criarPacienteRequest, CancellationToken cancellationToken = default)
         {
-            try
-            {
+            int idGerado = await _pacienteService.InserirPacienteAsync(criarPacienteRequest, cancellationToken);
 
-                if (request == null) return BadRequest("Dados inválidos.");
+            return CreatedAtAction
+                (
+                nameof(ObterPorID),
+                new { id = idGerado },
+                new { Id = idGerado }
+                );
+        }
 
-                var novoPaciente = new PacienteDto
-                {
-                    ResponsavelId = request.ResponsavelId,
-                    Nome = request.Nome,
-                    DataNascimento = request.DataNascimento,
-                };
-                int idGerado = _PacienteRepository.InserirPaciente(novoPaciente);
+        [HttpPatch]
+        [Route("{id:int}")]
+        public async Task<IActionResult> Atualizar([FromRoute] int id, [FromBody] AtualizarPacienteRequest atualizarPacienteRequest, CancellationToken cancellationToken = default)
+        {
+            PacienteDto? pacienteAtualizado = await _pacienteService.AtualizarPacienteAsync(id, atualizarPacienteRequest, cancellationToken);
 
-                novoPaciente.Id = idGerado;
-                novoPaciente.DataCadastro = DateTime.Now;
-
-                return StatusCode(201, $"O novo paciente foi criado com o ID :{novoPaciente}");
-
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Erro ao salvar: {ex.Message}");
-            }
-
+            return Ok(pacienteAtualizado);
         }
 
         [HttpDelete]
-        [Route("api/[controller]")]
-        public async Task<IActionResult> DeletarPacienteAsync(int id)
+        [Route("{id:int}")]
+        public async Task<IActionResult> Deletar([FromRoute] int id, CancellationToken cancellationToken = default)
         {
-            try
-            {
-                var (linhasDeletadas, idDeletado) = await _PacienteRepository.DeletarPacienteAsync(id);
-                return StatusCode(200, $"Agendamentos deletados : {linhasDeletadas} \nID deletado : {idDeletado}");
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Erro ao Deletar Paciente: {ex.Message}");
-            }
+            int idDeletado = await _pacienteService.DeletarPacienteAsync(id, cancellationToken);
+            return Ok(idDeletado);
         }
     }
 }
