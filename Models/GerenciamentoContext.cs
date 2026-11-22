@@ -34,7 +34,8 @@ public partial class GerenciamentoContext : DbContext
             entity.HasIndex(e => e.DataHoraInicio, "IX_Agendamentos_DataHoraInicio");
 
             entity.HasIndex(e => e.Status, "IX_Agendamentos_Status");
-
+            
+            entity.Property(e => e.Ativo).HasDefaultValue(true);
             entity.Property(e => e.Observacoes).IsUnicode(false);
             entity.Property(e => e.Status)
                 .HasMaxLength(20)
@@ -61,6 +62,7 @@ public partial class GerenciamentoContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PK__Paciente__3214EC07D3243B0C");
 
+            entity.Property(e => e.Ativo).HasDefaultValue(true);
             entity.Property(e => e.DataCadastro).HasDefaultValueSql("(sysdatetime())", "DF_Pacientes_DataCadastro");
             entity.Property(e => e.Nome)
                 .HasMaxLength(100)
@@ -92,6 +94,7 @@ public partial class GerenciamentoContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PK__Responsa__3214EC075CB83DF2");
 
+            entity.Property(e => e.Ativo).HasDefaultValue(true);
             entity.Property(e => e.DataCadastro).HasDefaultValueSql("(sysdatetime())", "DF_Responsaveis_DataCadastro");
             entity.Property(e => e.Email)
                 .HasMaxLength(100)
@@ -108,6 +111,7 @@ public partial class GerenciamentoContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PK__Salas__3214EC07A984516E");
 
+            entity.Property(e => e.Ativo).HasDefaultValue(true);
             entity.Property(e => e.Capacidade).HasDefaultValue(1, "DF_Salas_Capacidade");
             entity.Property(e => e.Nome)
                 .HasMaxLength(50)
