@@ -1,7 +1,8 @@
-﻿using Microsoft.AspNetCore.Diagnostics;
+﻿using GerenciamentoSalas.API.Common.Exceptions;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GerenciamentoSalas.API.Common.Exceptions
+namespace GerenciamentoSalas.API.Common
 {
     public class GlobalExceptionHandler : IExceptionHandler
     {
@@ -24,7 +25,6 @@ namespace GerenciamentoSalas.API.Common.Exceptions
                 InvalidOperationException => (StatusCodes.Status409Conflict, "Conflito de regra de negócio"),
                 ArgumentException => (StatusCodes.Status400BadRequest, "Requisição inválida"),
                 DisponibilidadeException => (StatusCodes.Status409Conflict, "Conflito de disponibilidade"),
-                ExistenciaNaTabelaException => (StatusCodes.Status404NotFound, "Nao Existe na tabela"),
                 _ => (StatusCodes.Status500InternalServerError, "Erro interno no servidor")
             };
 
