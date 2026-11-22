@@ -1,5 +1,4 @@
-﻿using GerenciamentoSalas.API.Common.Exceptions;
-using GerenciamentoSalas.API.Common.Repositorie.interfaces;
+﻿using GerenciamentoSalas.API.Common.Repositorie.interfaces;
 using GerenciamentoSalas.API.Common.Service.Interface;
 
 namespace GerenciamentoSalas.API.Common.Service
@@ -22,7 +21,7 @@ namespace GerenciamentoSalas.API.Common.Service
         public async Task<bool> VerificarExistenciaAsync<T>(T entidade, CancellationToken cancellationToken = default)
         {
             bool existe = await _commonRepository.VerificarExistenciaAsync(entidade, cancellationToken);
-            if (!existe) { _logger.LogInformation($"{entidade} nao existe"); throw new ExistenciaNaTabelaException(entidade); }
+            if (!existe) { _logger.LogInformation("{entidade} nao existe", entidade); throw new KeyNotFoundException("Entidade não encontrada na base de dados"); }
             return existe;
         }
         public async Task<bool> VerificarExistenciaDisponibilidadeAsync<T>(T entidade, DateTime DataInicio, DateTime DataFim, int? agendamentoIdIgnorar = null, CancellationToken cancellationToken = default)
@@ -38,7 +37,7 @@ namespace GerenciamentoSalas.API.Common.Service
         }
         public async Task<bool> VerficarAgendamentosAtivos<T>(T entidade, CancellationToken cancellationToken = default)
         {
-            bool existe = await _commonRepository.VerficarAgendamentosAtivos(entidade,cancellationToken);
+            bool existe = await _commonRepository.VerficarAgendamentosAtivos(entidade, cancellationToken);
             return existe;
         }
     }
