@@ -1,115 +1,105 @@
-﻿using GerenciamentoSalas.API.Models.DTOs;
-using Microsoft.Data.SqlClient;
+﻿using GerenciamentoSalas.API.Models;
+using GerenciamentoSalas.API.Models.DTOs;
+using GerenciamentoSalas.API.Repositories.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace GerenciamentoSalas.API.Repositories
 {
-    public class ProfissionalRepository
+    public class ProfissionalRepository(GerenciamentoContext gerenciamentoContext) : IProfissionalRepository
     {
-        private readonly string _connectionString;
+        private readonly GerenciamentoContext _dbContext = gerenciamentoContext;
 
-        public ProfissionalRepository(IConfiguration configuration)
+        public async Task<ProfissionalDto?> ObterProfissionalPorIdAsync(int id, CancellationToken cancellationToken = default)
         {
-            _connectionString = configuration.GetConnectionString("ConexaoPadrao")
-                ?? throw new ArgumentNullException("String de conexão não encontrada.");
+            ProfissionalDto? profissionalDto = await _dbContext.Profissionais
+                .FirstOrDefaultAsync(x => x.Id == id && x.Ativo == true, cancellationToken);
+
+            if (profissionalDto is null)
+                return null;
+
+            profissionalDto.Agendamentos = await _dbContext.Agendamentos
+                .Where(x => x.ProfissionalId == profissionalDto.Id && x.Ativo == true)
+                .ToListAsync(cancellationToken);
+
+            return profissionalDto;
         }
 
-        public List<ProfissionalDto> ObterTodosProfissional()
+        public async Task<List<ProfissionalDto>> ObterTodosProfissionalAsync(CancellationToken cancellationToken)
         {
-            var lista = new List<ProfissionalDto>();
+            List<ProfissionalDto> profissionalDtos = await _dbContext.Profissionais
+            .Where(x => x.Ativo == true)
+            .ToListAsync(cancellationToken);
 
-            using (var conexao = new SqlConnection(_connectionString))
+            List<int> profissionalIds = profissionalDtos.Select(p => p.Id).ToList();
+
+            var agendamentoPorProfissional = await _dbContext.Agendamentos
+                .Where(x => x.Ativo == true && profissionalIds.Contains(x.ProfissionalId))
+                .GroupBy(x => x.ProfissionalId)
+                .ToDictionaryAsync(g => g.Key, g => g.ToList(), cancellationToken);
+
+            foreach (ProfissionalDto profissional in profissionalDtos)
             {
-                string sql = "SELECT Id, Nome, Especialidade, Ativo FROM Profissionais";
-
-                using (var comando = new SqlCommand(sql, conexao))
-                {
-                    conexao.Open();
-                    using (SqlDataReader reader = comando.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            var prof = new ProfissionalDto
-                            {
-                                Id = Convert.ToInt32(reader["Id"]),
-                                Nome = reader["Nome"].ToString() ?? string.Empty,
-                                Especialidade = reader["Especialidade"].ToString() ?? string.Empty,
-                                Ativo = Convert.ToBoolean(reader["Ativo"])
-                            };
-                            lista.Add(prof);
-                        }
-                    }
-                }
+                profissional.Agendamentos = agendamentoPorProfissional.TryGetValue(profissional.Id, out var lista)
+                    ? lista
+                    : [];
             }
-            return lista;
+
+            return profissionalDtos;
         }
 
-        public int InserirProfissional(ProfissionalDto profissional)
+        public async Task<int> InserirProfissionalAsync(ProfissionalDto profissional, CancellationToken cancellationToken = default)
         {
-            using var conexao = new SqlConnection(_connectionString);
-            string sql = @"INSERT INTO Profissionais (Nome, Especialidade, Ativo) 
-                   OUTPUT INSERTED.Id
-                   VALUES (@Nome, @Especialidade, @Ativo);";
+            await _dbContext.Profissionais.AddAsync(profissional, cancellationToken);
 
-            using var comando = new SqlCommand(sql, conexao);
-            comando.Parameters.AddWithValue("@Nome", profissional.Nome);
-            comando.Parameters.AddWithValue("@Especialidade", profissional.Especialidade);
-            comando.Parameters.AddWithValue("@Ativo", profissional.Ativo);
+            await _dbContext.SaveChangesAsync(cancellationToken);
 
-            conexao.Open();
-            return Convert.ToInt32(comando.ExecuteScalar());
+            return profissional.Id;
         }
 
-        public async Task<(List<int> IdAgendamentosDeletados, int IdResponsavelDeletado)> DeletarProfissionaisAsync(int id)
+        public async Task<ProfissionalDto?> AtualizarProfissionalAsync(AtualizarProfissionalDto atualizarProfissionalDto, CancellationToken cancellationToken = default)
         {
+            ProfissionalDto? profissionalBanco = await _dbContext.Profissionais.FirstOrDefaultAsync(x => x.Id == atualizarProfissionalDto.Id, cancellationToken);
 
-            using var conexao = new SqlConnection(_connectionString);
-            await conexao.OpenAsync();
-            using var transaction = conexao.BeginTransaction();
-
-            try
+            if (profissionalBanco is not null)
             {
+                if (!String.IsNullOrWhiteSpace(atualizarProfissionalDto.Nome)) { profissionalBanco.Nome = atualizarProfissionalDto.Nome!; }
+                if (!String.IsNullOrWhiteSpace(atualizarProfissionalDto.Especialidade)) { profissionalBanco.Especialidade = atualizarProfissionalDto.Especialidade!; }
+                if (!String.IsNullOrWhiteSpace(atualizarProfissionalDto.Telefone)) { profissionalBanco.Telefone = atualizarProfissionalDto.Telefone!; }
 
-                string sqlAgendamento = @"DELETE [bd_gerenciamento].[dbo].[Agendamentos]
-                    OUTPUT deleted.Id
-                    FROM [bd_gerenciamento].[dbo].[Agendamentos]
-                    INNER JOIN [bd_gerenciamento].[dbo].[Profissionais] ON [bd_gerenciamento].[dbo].[Profissionais].[Id] = [bd_gerenciamento].[dbo].[Agendamentos].[SalaId]
-                    where [bd_gerenciamento].[dbo].[Profissionais].[Id] = @IdProfissional";
+                //profissionalBanco.Email = atualizarProfissionalDto.Email; lembrar de inserir o e-mail depois
 
-                var IdsDeletadosAgendamento = new List<int>();
+                await _dbContext.SaveChangesAsync(cancellationToken);
 
-                using (var cmd = new SqlCommand(sqlAgendamento, conexao, transaction))
-                {
-                    cmd.Parameters.AddWithValue("@IdProfissional", id);
+                profissionalBanco.Agendamentos = await _dbContext.Agendamentos.Where(x => x.ProfissionalId == profissionalBanco.Id && x.Ativo == true).ToListAsync(cancellationToken);
 
-                    using var reader = await cmd.ExecuteReaderAsync();
-
-                    while (await reader.ReadAsync())
-                    {
-                        IdsDeletadosAgendamento.Add(reader.GetInt32(0));
-                    }
-
-                }
-
-                string sqlProfissionais = @"
-                    DELETE [bd_gerenciamento].[dbo].[Profissionais]
-                    OUTPUT deleted.Id
-                    FROM [bd_gerenciamento].[dbo].[Profissionais]
-                    where [bd_gerenciamento].[dbo].[Profissionais].[Id] = @IdProfissional";
-
-                int idDeletadoProfissionais = 0;
-                using (var cmd = new SqlCommand(sqlProfissionais, conexao, transaction))
-                {
-                    cmd.Parameters.AddWithValue("@IdProfissional", id);
-                    idDeletadoProfissionais = Convert.ToInt32(await cmd.ExecuteScalarAsync());
-                }
-                transaction.Commit();
-                return (IdsDeletadosAgendamento, idDeletadoProfissionais);
+                return profissionalBanco;
             }
-            catch (Exception)
+            else
             {
-                transaction.Rollback();
-                throw;
+                return null;
             }
+        }
+
+        public async Task<(int agendamentosDeletados, int profissionalId)> DeletarProfissionalAsync(ProfissionalDto profissional, CancellationToken cancellationToken = default)
+        {
+            await using var transaction = await _dbContext.Database.BeginTransactionAsync(cancellationToken);
+
+            ProfissionalDto? profissionalBanco = await _dbContext.Profissionais
+                .FirstOrDefaultAsync(x => x.Id == profissional.Id, cancellationToken)
+                ?? throw new KeyNotFoundException("Profissional não encontrado no banco");
+
+            int agendamentosDeletados = await _dbContext.Agendamentos
+            .Where(x => x.Ativo == true && x.ProfissionalId == profissional.Id)
+            .ExecuteUpdateAsync(setters => setters
+            .SetProperty(a => a.Ativo, false),
+            cancellationToken);
+
+            profissionalBanco.Ativo = false;
+
+            await _dbContext.SaveChangesAsync(cancellationToken);
+            await transaction.CommitAsync(cancellationToken);
+
+            return (agendamentosDeletados, profissional.Id);
         }
     }
 }

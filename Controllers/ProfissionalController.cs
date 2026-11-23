@@ -1,80 +1,59 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using GerenciamentoSalas.API.Models.DTOs;
+using GerenciamentoSalas.API.Models.Requests;
+using GerenciamentoSalas.API.Services.Interfaces;
+using Microsoft.AspNetCore.Mvc;
 
 namespace GerenciamentoSalas.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class ProfissionalController : ControllerBase
+    public class ProfissionalController(IProfissionalService profissionalService) : ControllerBase
     {
-        /*private readonly ProfissionaisRepository _ProfissionaisRepository;
-
-        public ProfissionalController(IConfiguration configuration)
+        private readonly IProfissionalService _profissionalService = profissionalService;
+        [HttpGet]
+        [Route("{id:int}")]
+        public async Task<IActionResult> ObterPorID([FromRoute] int id, CancellationToken cancellationToken = default)
         {
-            _ProfissionaisRepository = new ProfissionaisRepository(configuration);
+            ProfissionalDto? profissional = await _profissionalService.ObterProfissionalPorIdAsync(id, cancellationToken);
+            if (profissional == null) { return NotFound($"Profissional com ID {id} não encontrado"); }
+            else { return Ok(profissional); }
         }
 
-        [HttpGet] TempDataAttribute tem que colocar as coisas no singular
-        [Route("api/[controller]")]
-        public IActionResult ObterTodos()
+        [HttpGet]
+        public async Task<IActionResult> ObterTodos(CancellationToken cancellationToken = default)
         {
-            try
-            {
-                var profissionais = _ProfissionaisRepository.ObterTodosProfissional();
-                return Ok(profissionais);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Erro interno no servidor ao buscar profissionais: {ex.Message}");
-            }
+            List<ProfissionalDto> profissionals = await _profissionalService.ObterTodosProfissionalAsync(cancellationToken);
+            return Ok(profissionals);
         }
 
         [HttpPost]
-        [Route("api/[controller]")]
-        public IActionResult Inserir([FromBody] CriarProfissionalRequest input)
+        public async Task<IActionResult> Inserir([FromBody] CriarProfissionalRequest criarProfissionalRequest, CancellationToken cancellationToken = default)
         {
-            try
-            {
-                if (input == null) return BadRequest("Dados inválidos.");
+            int idGerado = await _profissionalService.InserirProfissionalAsync(criarProfissionalRequest, cancellationToken);
 
-                var profissional = new Profissional
-                {
-                    Nome = input.Nome,
-                    Especialidade = input.Especialidade,
-                    Ativo = input.Ativo
-                };
+            return CreatedAtAction
+                (
+                nameof(ObterPorID),
+                new { id = idGerado },
+                new { Id = idGerado }
+                );
+        }
 
-                int idGerado = _ProfissionaisRepository.InserirProfissional(profissional);
-                profissional.Id = idGerado;
+        [HttpPatch]
+        [Route("{id:int}")]
+        public async Task<IActionResult> Atualizar([FromRoute] int id, [FromBody] AtualizarProfissionalRequest atualizarProfissionalRequest, CancellationToken cancellationToken = default)
+        {
+            ProfissionalDto? profissionalAtualizado = await _profissionalService.AtualizarProfissionalAsync(id, atualizarProfissionalRequest, cancellationToken);
 
-                return StatusCode(201, profissional);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Erro ao salvar profissional: {ex.Message}");
-            }
+            return Ok(profissionalAtualizado);
         }
 
         [HttpDelete]
-        [Route("api/[controller]")]
-        public async Task<IActionResult> Deletar([FromBody] int ProfissionaisId)
+        [Route("{id:int}")]
+        public async Task<IActionResult> Deletar([FromRoute] int id, CancellationToken cancellationToken = default)
         {
-            try
-            {
-                var request = new DeletarProfissionalRequest { Id = ProfissionaisId };
-                var (agendamentosDeletados, profissionaisDeletados) =
-                    await _ProfissionaisRepository.DeletarProfissionaisAsync(request);
-
-                return Ok(new
-                {
-                    AgendamentosDeletados = agendamentosDeletados,
-                    ProfissionaisDeletados = profissionaisDeletados
-                });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Erro ao deletar Profissionais: {ex.Message}");
-            }
+            int idDeletado = await _profissionalService.DeletarProfissionalAsync(id, cancellationToken);
+            return Ok(idDeletado);
         }
-    */
     }
 }
