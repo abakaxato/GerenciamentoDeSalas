@@ -1,80 +1,59 @@
 ﻿using GerenciamentoSalas.API.Models.DTOs;
 using GerenciamentoSalas.API.Models.Requests;
-using GerenciamentoSalas.API.Repositories;
+using GerenciamentoSalas.API.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GerenciamentoSalas.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class SalaController : ControllerBase
+    public class SalaController(ISalaService salaService) : ControllerBase
     {
-        private readonly SalaRepository _SalaRepository;
-
-        public SalaController(IConfiguration configuration)
+        private readonly ISalaService _salaService = salaService;
+        [HttpGet]
+        [Route("{id:int}")]
+        public async Task<IActionResult> ObterPorID([FromRoute] int id, CancellationToken cancellationToken = default)
         {
-            _SalaRepository = new SalaRepository(configuration);
+            SalaDto? sala = await _salaService.ObterSalaPorIdAsync(id, cancellationToken);
+            if (sala == null) { return NotFound($"Sala com ID {id} não encontrado"); }
+            else { return Ok(sala); }
         }
 
         [HttpGet]
-        [Route("api/[controller]")]
-        public IActionResult ObterTodos()
+        public async Task<IActionResult> ObterTodos(CancellationToken cancellationToken = default)
         {
-            try
-            {
-                var salas = _SalaRepository.ObterTodosSala();
-                return Ok(salas);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Erro interno no servidor ao buscar salas: {ex.Message}");
-            }
+            List<SalaDto> salas = await _salaService.ObterTodosSalaAsync(cancellationToken);
+            return Ok(salas);
         }
 
         [HttpPost]
-        [Route("api/[controller]")]
-        public IActionResult Inserir([FromBody] CriarSalaRequest input)
+        public async Task<IActionResult> Inserir([FromBody] CriarSalaRequest criarSalaRequest, CancellationToken cancellationToken = default)
         {
-            try
-            {
-                if (input == null) return BadRequest("Dados inválidos.");
+            int idGerado = await _salaService.InserirSalaAsync(criarSalaRequest, cancellationToken);
 
-                var sala = new SalaDto
-                {
-                    Nome = input.Nome,
-                    Capacidade = input.Capacidade,
-                };
-
-                int idGerado = _SalaRepository.InserirSala(sala);
-                sala.Id = idGerado;
-
-                return StatusCode(201, sala);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Erro ao salvar sala: {ex.Message}");
-            }
+            return CreatedAtAction
+                (
+                nameof(ObterPorID),
+                new { id = idGerado },
+                new { Id = idGerado }
+                );
         }
-        [HttpDelete]
-        [Route("api/[controller]")]
-        public async Task<IActionResult> Deletar([FromBody] int salaId)
-        {
-            try
-            {
-                var request = new DeletarSalaRequest { id = salaId };
-                var (salaDeletada, agendamentosDeletados) =
-                    await _SalaRepository.DeletarSalaAsync(request);
 
-                return Ok(new
-                {
-                    AgendamentosDeletados = agendamentosDeletados,
-                    SalaDeletada = salaDeletada
-                });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Erro ao deletar Sala: {ex.Message}");
-            }
+        [HttpPatch]
+        [Route("{id:int}")]
+        public async Task<IActionResult> Atualizar([FromRoute] int id, [FromBody] AtualizarSalaRequest atualizarSalaRequest, CancellationToken cancellationToken = default)
+        {
+            SalaDto? salaAtualizado = await _salaService.AtualizarSalaAsync(id, atualizarSalaRequest, cancellationToken);
+
+            return Ok(salaAtualizado);
+        }
+
+        [HttpDelete]
+        [Route("{id:int}")]
+        public async Task<IActionResult> Deletar([FromRoute] int id, CancellationToken cancellationToken = default)
+        {
+            int idDeletado = await _salaService.DeletarSalaAsync(id, cancellationToken);
+            return Ok(idDeletado);
         }
     }
 }
