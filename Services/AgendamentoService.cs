@@ -77,7 +77,7 @@ namespace GerenciamentoSalas.API.Services
 
             int idGerado = await _agendamentoRepository.InserirAgendamentoAsync(agendamento, cancellationToken);
 
-            _logger.LogInformation("Agendamento inserido com sucesso. {agendamentoId}",agendamento.Id);
+            _logger.LogInformation("Agendamento inserido com sucesso. {agendamentoId}", agendamento.Id);
 
             return idGerado;
         }
@@ -154,7 +154,7 @@ namespace GerenciamentoSalas.API.Services
 
             await _agendamentoRepository.DeletarAgendamentoAsync(agendamento, cancellationToken);
 
-            _logger.LogInformation("Agendamento com ID {agendamentoId} removido com sucesso",agendamento.Id);
+            _logger.LogInformation("Agendamento com ID {agendamentoId} removido com sucesso", agendamento.Id);
             return agendamento.Id;
         }
     }

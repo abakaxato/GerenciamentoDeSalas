@@ -60,7 +60,8 @@ namespace GerenciamentoSalas.API.Repositories
             {
                 _logger.LogError("Durante a atualizacao nao foram encontrados agendamentos com o ID {atualizarAgendamentoDtoId}", atualizarAgendamentoDto.Id);
                 return null;
-            };
+            }
+            ;
         }
         public async Task<int> DeletarAgendamentoAsync(AgendamentoDto agendamento, CancellationToken cancellationToken = default)
         {

@@ -28,7 +28,7 @@ namespace GerenciamentoSalas.API.Services
         }
         public async Task<int> InserirResponsavelAsync(CriarResponsavelRequest criarResponsavelRequest, CancellationToken cancellationToken = default)
         {
-            if(String.IsNullOrWhiteSpace(criarResponsavelRequest.Nome) || String.IsNullOrWhiteSpace(criarResponsavelRequest.Telefone))
+            if (String.IsNullOrWhiteSpace(criarResponsavelRequest.Nome) || String.IsNullOrWhiteSpace(criarResponsavelRequest.Telefone))
             {
                 _logger.LogError("Não é possivel inserir um novo responsavel sem Nome ou Telefone");
                 throw new ArgumentException("Não é possivel inserir um novo responsavel sem Nome e Telefone");
@@ -89,9 +89,9 @@ namespace GerenciamentoSalas.API.Services
                 throw new KeyNotFoundException($"Nao existe responsavel com ID : {responsavel.Id}, delecao cancelada");
             }
 
-            var (pacientesDeletados,agendamentosDeletados, responsavelId) = await _responsavelRepository.DeletarResponsavelAsync(responsavel, cancellationToken);
+            var (pacientesDeletados, agendamentosDeletados, responsavelId) = await _responsavelRepository.DeletarResponsavelAsync(responsavel, cancellationToken);
 
-            _logger.LogInformation("Foram deletados {PacientesDeletados} Pacientes e {agendamentosDeletados} agendamentos junto do responsavel {id}", pacientesDeletados, agendamentosDeletados,responsavelId);
+            _logger.LogInformation("Foram deletados {PacientesDeletados} Pacientes e {agendamentosDeletados} agendamentos junto do responsavel {id}", pacientesDeletados, agendamentosDeletados, responsavelId);
 
             return responsavelId;
         }

@@ -54,10 +54,10 @@ namespace GerenciamentoSalas.API.Services
             }
 
             if (id <= 0) { throw new ArgumentException("ID Menor ou igual a zero"); }
-            
-            if (request.Capacidade <= 0) 
+
+            if (request.Capacidade <= 0)
             {
-                _logger.LogError("A capacidade da sala deve ser maior que 0"); 
+                _logger.LogError("A capacidade da sala deve ser maior que 0");
                 throw new ArgumentException("A capacidade da sala deve ser maior que 0");
             }
             AtualizarSalaDto atualizarSalaDto = new()
@@ -94,7 +94,7 @@ namespace GerenciamentoSalas.API.Services
 
             var (agendamentosDeletados, salaId) = await _salaRepository.DeletarSalaAsync(sala, cancellationToken);
 
-            _logger.LogInformation("Foram deletados {agendamentosDeletados} agendamentos junto da sala {id}", agendamentosDeletados,salaId);
+            _logger.LogInformation("Foram deletados {agendamentosDeletados} agendamentos junto da sala {id}", agendamentosDeletados, salaId);
 
             return salaId;
         }

@@ -94,7 +94,7 @@ namespace GerenciamentoSalas.API.Services
 
             var (agendamentosDeletados, profissionalId) = await _profissionalRepository.DeletarProfissionalAsync(profissional, cancellationToken);
 
-            _logger.LogInformation("Foram deletados {agendamentosDeletados} agendamentos junto do profissional {id}", agendamentosDeletados,profissionalId);
+            _logger.LogInformation("Foram deletados {agendamentosDeletados} agendamentos junto do profissional {id}", agendamentosDeletados, profissionalId);
 
             return profissionalId;
         }

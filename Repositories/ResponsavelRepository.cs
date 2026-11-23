@@ -31,7 +31,7 @@ namespace GerenciamentoSalas.API.Repositories
             .ToListAsync(cancellationToken);
 
             List<int> responsavelIds = responsavelDtos.Select(p => p.Id).ToList();
-            
+
             var PacientePorResponsavel = await _dbContext.Pacientes
                 .Where(x => x.Ativo == true && x.ResponsavelId != null && responsavelIds.Contains(x.ResponsavelId.Value))
                 .GroupBy(x => x.ResponsavelId!.Value)
@@ -64,9 +64,9 @@ namespace GerenciamentoSalas.API.Repositories
             {
                 if (!String.IsNullOrWhiteSpace(atualizarResponsavelDto.Nome)) { responsavelBanco.Nome = atualizarResponsavelDto.Nome!; }
                 if (!String.IsNullOrWhiteSpace(atualizarResponsavelDto.Telefone)) { responsavelBanco.Telefone = atualizarResponsavelDto.Telefone!; }
-                
+
                 responsavelBanco.Email = atualizarResponsavelDto.Email;
-                
+
                 await _dbContext.SaveChangesAsync(cancellationToken);
 
                 responsavelBanco.Pacientes = await _dbContext.Pacientes.Where(x => x.ResponsavelId == responsavelBanco.Id && x.Ativo == true).ToListAsync(cancellationToken);
@@ -79,7 +79,7 @@ namespace GerenciamentoSalas.API.Repositories
             }
         }
 
-        public async Task<(int pacientesDeletados, int agendamentosDeletados, int responsavelId)> DeletarResponsavelAsync(ResponsavelDto responsavel,CancellationToken cancellationToken = default)
+        public async Task<(int pacientesDeletados, int agendamentosDeletados, int responsavelId)> DeletarResponsavelAsync(ResponsavelDto responsavel, CancellationToken cancellationToken = default)
         {
             await using var transaction = await _dbContext.Database.BeginTransactionAsync(cancellationToken);
 
