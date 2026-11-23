@@ -10,7 +10,6 @@ public partial class AtualizarResponsavelDto
 
     public string? Email { get; set; }
 
-    public bool Ativo { get; set; } = true;
     public override string ToString()
     {
         return Id.ToString();

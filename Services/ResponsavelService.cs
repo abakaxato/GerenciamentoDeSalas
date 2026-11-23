@@ -38,7 +38,8 @@ namespace GerenciamentoSalas.API.Services
             {
                 Nome = criarResponsavelRequest.Nome,
                 Email = criarResponsavelRequest.Email,
-                Telefone = criarResponsavelRequest.Telefone
+                Telefone = criarResponsavelRequest.Telefone,
+                Ativo = true
             };
 
             int idGerado = await _responsavelRepository.InserirResponsavelAsync(responsavel, cancellationToken);
