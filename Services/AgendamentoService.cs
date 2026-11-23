@@ -42,7 +42,7 @@ namespace GerenciamentoSalas.API.Services
             if (request == null)
             {
                 _logger.LogError("Erro ao inserir agendamento, requisição vazia");
-                throw new ArgumentNullException($"{request}");
+                throw new ArgumentNullException(nameof(request));
             }
 
             if (request.DataHoraFim <= request.DataHoraInicio)
@@ -77,7 +77,7 @@ namespace GerenciamentoSalas.API.Services
 
             int idGerado = await _agendamentoRepository.InserirAgendamentoAsync(agendamento, cancellationToken);
 
-            _logger.LogInformation($"Agendamento inserido com sucesso. {agendamento.Id}");
+            _logger.LogInformation("Agendamento inserido com sucesso. {agendamentoId}",agendamento.Id);
 
             return idGerado;
         }
@@ -87,7 +87,7 @@ namespace GerenciamentoSalas.API.Services
             if (request == null)
             {
                 _logger.LogError("Erro ao atualizar agendamento, requisição vazia");
-                throw new ArgumentNullException($"{request}");
+                throw new ArgumentNullException(nameof(request));
             }
 
             if (id <= 0) { throw new ArgumentException("ID Menor ou igual a zero"); }
@@ -121,7 +121,7 @@ namespace GerenciamentoSalas.API.Services
             }
             else { throw new KeyNotFoundException($"Nao foi possivel atualizar o agendamento {id}, ID nao encontrado no banco"); }
 
-            AtualizarAgendamentoDto AtualizarAgendamentoDto = new()
+            AtualizarAgendamentoDto atualizarAgendamentoDto = new()
             {
                 Id = id,
                 DataHoraInicio = request.DataHoraInicio,
@@ -130,12 +130,12 @@ namespace GerenciamentoSalas.API.Services
                 Status = request.Status
             };
 
-            AtualizarAgendamentoDto.Observacoes ??= agendamentoBanco.Observacoes;
+            atualizarAgendamentoDto.Observacoes ??= agendamentoBanco.Observacoes;
 
-            if (!AtualizarAgendamentoDto.Status.HasValue) { AtualizarAgendamentoDto.Status = agendamentoBanco.Status; }
+            if (!atualizarAgendamentoDto.Status.HasValue) { atualizarAgendamentoDto.Status = agendamentoBanco.Status; }
 
-            AgendamentoDto? agendamentoAtualizado = await _agendamentoRepository.AtualizarAgendamentoAsync(AtualizarAgendamentoDto, cancellationToken)
-                ?? throw new KeyNotFoundException($"Durante a atualizacao nao foram encontrados agendamentos com o ID {AtualizarAgendamentoDto.Id}");
+            AgendamentoDto? agendamentoAtualizado = await _agendamentoRepository.AtualizarAgendamentoAsync(atualizarAgendamentoDto, cancellationToken)
+                ?? throw new KeyNotFoundException($"Durante a atualizacao nao foram encontrados agendamentos com o ID {atualizarAgendamentoDto.Id}");
 
             return agendamentoAtualizado;
         }
@@ -154,7 +154,7 @@ namespace GerenciamentoSalas.API.Services
 
             await _agendamentoRepository.DeletarAgendamentoAsync(agendamento, cancellationToken);
 
-            _logger.LogInformation($"Agendamento com ID {agendamento.Id} removido com sucesso");
+            _logger.LogInformation("Agendamento com ID {agendamentoId} removido com sucesso",agendamento.Id);
             return agendamento.Id;
         }
     }

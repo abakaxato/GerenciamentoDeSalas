@@ -16,7 +16,7 @@ namespace GerenciamentoSalas.API.Controllers
         public async Task<IActionResult> ObterPorID([FromRoute] int id, CancellationToken cancellationToken = default)
         {
             AgendamentoDto? agendamento = await _agendamentoService.ObterAgendamentoPorIDAsync(id, cancellationToken);
-            if (agendamento == null) { return NotFound(agendamento); }
+            if (agendamento == null) { return NotFound($"Agendamento com ID {id} não encontrado"); }
             else { return Ok(agendamento); }
         }
 
