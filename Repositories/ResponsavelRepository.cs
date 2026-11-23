@@ -1,121 +1,119 @@
-﻿using GerenciamentoSalas.API.Models.DTOs;
-using Microsoft.Data.SqlClient;
+﻿using GerenciamentoSalas.API.Models;
+using GerenciamentoSalas.API.Models.DTOs;
+using GerenciamentoSalas.API.Repositories.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace GerenciamentoSalas.API.Repositories
 {
-    public class ResponsavelRepository
+    public class ResponsavelRepository(GerenciamentoContext gerenciamentoContext) : IResponsavelRepository
     {
-        private readonly string _connectionString;
+        private readonly GerenciamentoContext _dbContext = gerenciamentoContext;
 
-        public ResponsavelRepository(IConfiguration configuration)
+        public async Task<ResponsavelDto?> ObterResponsavelPorIdAsync(int id, CancellationToken cancellationToken = default)
         {
-            _connectionString = configuration.GetConnectionString("ConexaoPadrao")
-                ?? throw new ArgumentNullException("String de conexão não encontrada.");
+            ResponsavelDto? responsavelDto = await _dbContext.Responsaveis
+                .FirstOrDefaultAsync(x => x.Id == id && x.Ativo == true, cancellationToken);
+
+            if (responsavelDto is null)
+                return null;
+
+            responsavelDto.Pacientes = await _dbContext.Pacientes
+                .Where(x => x.ResponsavelId == responsavelDto.Id && x.Ativo == true)
+                .ToListAsync(cancellationToken);
+
+            return responsavelDto;
         }
 
-        public async Task<List<ResponsavelDto>> ObterTodosResponsavelAsync()
+        public async Task<List<ResponsavelDto>> ObterTodosResponsavelAsync(CancellationToken cancellationToken)
         {
-            var lista = new List<ResponsavelDto>();
+            List<ResponsavelDto> responsavelDtos = await _dbContext.Responsaveis
+            .Where(x => x.Ativo == true)
+            .ToListAsync(cancellationToken);
 
-            using var conexao = new SqlConnection(_connectionString);
-            string sql = "SELECT Id, Nome, Telefone, Email, DataCadastro FROM Responsaveis";
+            List<int> responsavelIds = responsavelDtos.Select(p => p.Id).ToList();
+            
+            var PacientePorResponsavel = await _dbContext.Pacientes
+                .Where(x => x.Ativo == true && x.ResponsavelId != null && responsavelIds.Contains(x.ResponsavelId.Value))
+                .GroupBy(x => x.ResponsavelId!.Value)
+                .ToDictionaryAsync(g => g.Key, g => g.ToList(), cancellationToken);
 
-            using var comando = new SqlCommand(sql, conexao);
-            await conexao.OpenAsync();
-
-            using var reader = await comando.ExecuteReaderAsync();
-            while (await reader.ReadAsync())
+            foreach (ResponsavelDto responsavel in responsavelDtos)
             {
-                var resp = new ResponsavelDto
-                {
-                    Id = Convert.ToInt32(reader["Id"]),
-                    Nome = reader["Nome"].ToString() ?? string.Empty,
-                    Telefone = reader["Telefone"].ToString() ?? string.Empty,
-                    Email = reader["Email"] != DBNull.Value ? reader["Email"].ToString() : null,
-                    DataCadastro = Convert.ToDateTime(reader["DataCadastro"])
-                };
-
-                lista.Add(resp);
+                responsavel.Pacientes = PacientePorResponsavel.TryGetValue(responsavel.Id, out var lista)
+                    ? lista
+                    : [];
             }
 
-            return lista;
+            return responsavelDtos;
         }
 
-        public async Task<int> InserirAsync(ResponsavelDto responsavel)
+        public async Task<int> InserirResponsavelAsync(ResponsavelDto responsavel, CancellationToken cancellationToken = default)
         {
-            using var conexao = new SqlConnection(_connectionString);
-            string sql = @"INSERT INTO Responsaveis (Nome, Telefone, Email) 
-                           OUTPUT INSERTED.Id
-                           VALUES (@Nome, @Telefone, @Email);";
+            await _dbContext.Responsaveis.AddAsync(responsavel, cancellationToken);
 
-            using var comando = new SqlCommand(sql, conexao);
-            comando.Parameters.AddWithValue("@Nome", responsavel.Nome);
-            comando.Parameters.AddWithValue("@Telefone", responsavel.Telefone);
-            comando.Parameters.AddWithValue("@Email", responsavel.Email ?? (object)DBNull.Value);
+            await _dbContext.SaveChangesAsync(cancellationToken);
 
-            await conexao.OpenAsync();
-            var resultado = await comando.ExecuteScalarAsync();
-            return Convert.ToInt32(resultado);
+            return responsavel.Id;
         }
 
-        public async Task<(int AgendamentosDeletado, List<int> IdsPacientesDeletados, int ResponsavelDeletado)> DeletarResponsavelAsync(int id)
+        public async Task<ResponsavelDto?> AtualizarResponsavelAsync(AtualizarResponsavelDto atualizarResponsavelDto, CancellationToken cancellationToken = default)
         {
-            using var conexao = new SqlConnection(_connectionString);
-            await conexao.OpenAsync();
-            using var transaction = conexao.BeginTransaction();
+            ResponsavelDto? responsavelBanco = await _dbContext.Responsaveis.FirstOrDefaultAsync(x => x.Id == atualizarResponsavelDto.Id, cancellationToken);
 
-            try
+            if (responsavelBanco is not null)
             {
-                // 1) Apaga agendamentos dos pacientes do responsável e captura a quantidade
-                string sqlAgend = @"
-                    DELETE A
-                    FROM dbo.Agendamentos A
-                    INNER JOIN dbo.Pacientes P ON A.PacienteId = P.Id
-                    WHERE P.ResponsavelId = @ResponsavelId;
-                    SELECT @@ROWCOUNT;";
+                if (!String.IsNullOrWhiteSpace(atualizarResponsavelDto.Nome)) { responsavelBanco.Nome = atualizarResponsavelDto.Nome!; }
+                if (!String.IsNullOrWhiteSpace(atualizarResponsavelDto.Telefone)) { responsavelBanco.Telefone = atualizarResponsavelDto.Telefone!; }
+                
+                responsavelBanco.Email = atualizarResponsavelDto.Email;
+                
+                await _dbContext.SaveChangesAsync(cancellationToken);
 
-                int agendamentosDeletados = 0;
-                using (var cmd = new SqlCommand(sqlAgend, conexao, transaction))
-                {
-                    cmd.Parameters.AddWithValue("@ResponsavelId", id);
-                    agendamentosDeletados = Convert.ToInt32(await cmd.ExecuteScalarAsync());
-                }
+                responsavelBanco.Pacientes = await _dbContext.Pacientes.Where(x => x.ResponsavelId == responsavelBanco.Id && x.Ativo == true).ToListAsync(cancellationToken);
 
-                // 2) Apaga todos os pacientes do responsável e retorna todos os ids deletados
-                string sqlPacientes = @"
-                    DELETE P
-                    OUTPUT deleted.Id
-                    FROM dbo.Pacientes P
-                    WHERE P.ResponsavelId = @ResponsavelId;";
-
-                var idsDeletados = new List<int>();
-                using (var cmd = new SqlCommand(sqlPacientes, conexao, transaction))
-                {
-                    cmd.Parameters.AddWithValue("@ResponsavelId", id);
-                    using var reader = await cmd.ExecuteReaderAsync();
-                    while (await reader.ReadAsync())
-                    {
-                        idsDeletados.Add(reader.GetInt32(0));
-                    }
-                }
-
-                // 3) Apagar o responsável (retorna quantidade de linhas apagadas)
-                string sqlResponsavel = @"DELETE FROM dbo.Responsaveis WHERE Id = @ResponsavelId; SELECT @@ROWCOUNT;";
-                int responsavelDeletado = 0;
-                using (var cmd = new SqlCommand(sqlResponsavel, conexao, transaction))
-                {
-                    cmd.Parameters.AddWithValue("@ResponsavelId", id);
-                    responsavelDeletado = Convert.ToInt32(await cmd.ExecuteScalarAsync());
-                }
-
-                transaction.Commit();
-                return (agendamentosDeletados, idsDeletados, responsavelDeletado);
+                return responsavelBanco;
             }
-            catch
+            else
             {
-                transaction.Rollback();
-                throw;
+                return null;
             }
+        }
+
+        public async Task<(int pacientesDeletados, int agendamentosDeletados, int responsavelId)> DeletarResponsavelAsync(ResponsavelDto responsavel,CancellationToken cancellationToken = default)
+        {
+            await using var transaction = await _dbContext.Database.BeginTransactionAsync(cancellationToken);
+
+            ResponsavelDto? responsavelBanco = await _dbContext.Responsaveis
+                .FirstOrDefaultAsync(x => x.Id == responsavel.Id, cancellationToken)
+                ?? throw new KeyNotFoundException("Responsável não encontrado no banco");
+
+            List<int> pacienteIds = await _dbContext.Pacientes
+                .Where(x => x.Ativo == true && x.ResponsavelId == responsavel.Id)
+                .Select(x => x.Id)
+                .ToListAsync(cancellationToken);
+
+            int agendamentosDeletados = 0;
+            if (pacienteIds.Count > 0)
+            {
+                agendamentosDeletados = await _dbContext.Agendamentos
+                    .Where(x => x.Ativo == true && pacienteIds.Contains(x.PacienteId))
+                    .ExecuteUpdateAsync(setters => setters
+                        .SetProperty(a => a.Ativo, false),
+                        cancellationToken);
+            }
+
+            int pacientesDeletados = await _dbContext.Pacientes
+                .Where(x => x.Ativo == true && x.ResponsavelId == responsavel.Id)
+                .ExecuteUpdateAsync(setters => setters
+                    .SetProperty(p => p.Ativo, false),
+                    cancellationToken);
+
+            responsavelBanco.Ativo = false;
+
+            await _dbContext.SaveChangesAsync(cancellationToken);
+            await transaction.CommitAsync(cancellationToken);
+
+            return (pacientesDeletados, agendamentosDeletados, responsavel.Id);
         }
     }
 }

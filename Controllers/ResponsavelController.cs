@@ -1,83 +1,59 @@
 ﻿using GerenciamentoSalas.API.Models.DTOs;
 using GerenciamentoSalas.API.Models.Requests;
-using GerenciamentoSalas.API.Repositories;
+using GerenciamentoSalas.API.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GerenciamentoSalas.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class ResponsavelController : ControllerBase
+    public class ResponsavelController(IResponsavelService responsavelService) : ControllerBase
     {
-        private readonly ResponsavelRepository _ResponsavelRepository;
-
-        public ResponsavelController(IConfiguration configuration)
+        private readonly IResponsavelService _responsavelService = responsavelService;
+        [HttpGet]
+        [Route("{id:int}")]
+        public async Task<IActionResult> ObterPorID([FromRoute] int id, CancellationToken cancellationToken = default)
         {
-            _ResponsavelRepository = new ResponsavelRepository(configuration);
+            ResponsavelDto? responsavel = await _responsavelService.ObterResponsavelPorIdAsync(id, cancellationToken);
+            if (responsavel == null) { return NotFound($"Responsavel com ID {id} não encontrado"); }
+            else { return Ok(responsavel); }
         }
 
         [HttpGet]
-        public async Task<IActionResult> ObterTodos()
+        public async Task<IActionResult> ObterTodos(CancellationToken cancellationToken = default)
         {
-            try
-            {
-                var responsaveis = await _ResponsavelRepository.ObterTodosResponsavelAsync();
-                return Ok(responsaveis);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Erro interno no servidor: {ex.Message}");
-            }
+            List<ResponsavelDto> responsavels = await _responsavelService.ObterTodosResponsavelAsync(cancellationToken);
+            return Ok(responsavels);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Inserir([FromBody] CriarResponsavelRequest input)
+        public async Task<IActionResult> Inserir([FromBody] CriarResponsavelRequest criarResponsavelRequest, CancellationToken cancellationToken = default)
         {
-            try
-            {
-                if (input == null) return BadRequest("Dados inválidos.");
+            int idGerado = await _responsavelService.InserirResponsavelAsync(criarResponsavelRequest, cancellationToken);
 
-                var novoResponsavel = new ResponsavelDto
-                {
-                    Nome = input.Nome,
-                    Telefone = input.Telefone,
-                    Email = input.Email
-                };
+            return CreatedAtAction
+                (
+                nameof(ObterPorID),
+                new { id = idGerado },
+                new { Id = idGerado }
+                );
+        }
 
-                int idGerado = await _ResponsavelRepository.InserirAsync(novoResponsavel);
+        [HttpPatch]
+        [Route("{id:int}")]
+        public async Task<IActionResult> Atualizar([FromRoute] int id, [FromBody] AtualizarResponsavelRequest atualizarResponsavelRequest, CancellationToken cancellationToken = default)
+        {
+            ResponsavelDto? responsavelAtualizado = await _responsavelService.AtualizarResponsavelAsync(id, atualizarResponsavelRequest, cancellationToken);
 
-                novoResponsavel.Id = idGerado;
-                novoResponsavel.DataCadastro = DateTime.Now;
-
-                return StatusCode(201, novoResponsavel);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Erro ao salvar: {ex.Message}");
-            }
+            return Ok(responsavelAtualizado);
         }
 
         [HttpDelete]
-        public async Task<IActionResult> Deletar([FromBody] int id)
+        [Route("{id:int}")]
+        public async Task<IActionResult> Deletar([FromRoute] int id, CancellationToken cancellationToken = default)
         {
-            try
-            {
-                /* var (agendamentosDeletados, idsPacientesDeletados, responsavelDeletado) =
-                     await _ResponsavelRepository.DeletarResponsavelAsync(request);
-
-                 return Ok(new
-                 {
-                     AgendamentosDeletados = agendamentosDeletados,
-                     PacientesDeletados = idsPacientesDeletados.Count,
-                     IdsPacientesDeletados = idsPacientesDeletados,
-                     ResponsavelDeletado = responsavelDeletado
-                 });*/
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Erro ao deletar Responsavel: {ex.Message}");
-            }
+            int idDeletado = await _responsavelService.DeletarResponsavelAsync(id, cancellationToken);
+            return Ok(idDeletado);
         }
     }
 }
