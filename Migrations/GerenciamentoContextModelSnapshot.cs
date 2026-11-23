@@ -128,6 +128,10 @@ namespace GerenciamentoSalas.API.Migrations
                         .HasColumnType("bit")
                         .HasDefaultValue(true, "DF_Profissionais_Ativo");
 
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Especialidade")
                         .IsRequired()
                         .HasMaxLength(50)

@@ -40,6 +40,7 @@ namespace GerenciamentoSalas.API.Services
                 Nome = criarProfissionalRequest.Nome,
                 Especialidade = criarProfissionalRequest.Especialidade,
                 Telefone = criarProfissionalRequest.Telefone,
+                Email = criarProfissionalRequest.Email,
                 Ativo = true
             };
 
@@ -62,6 +63,7 @@ namespace GerenciamentoSalas.API.Services
                 Id = id,
                 Nome = request.Nome,
                 Especialidade = request.Especialidade,
+                Email = request.Email,
                 Telefone = request.Telefone,
             };
 

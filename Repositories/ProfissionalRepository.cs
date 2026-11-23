@@ -65,8 +65,7 @@ namespace GerenciamentoSalas.API.Repositories
                 if (!String.IsNullOrWhiteSpace(atualizarProfissionalDto.Nome)) { profissionalBanco.Nome = atualizarProfissionalDto.Nome!; }
                 if (!String.IsNullOrWhiteSpace(atualizarProfissionalDto.Especialidade)) { profissionalBanco.Especialidade = atualizarProfissionalDto.Especialidade!; }
                 if (!String.IsNullOrWhiteSpace(atualizarProfissionalDto.Telefone)) { profissionalBanco.Telefone = atualizarProfissionalDto.Telefone!; }
-
-                //profissionalBanco.Email = atualizarProfissionalDto.Email; lembrar de inserir o e-mail depois
+                if (!String.IsNullOrWhiteSpace(atualizarProfissionalDto.Email)) { profissionalBanco.Email = atualizarProfissionalDto.Email!; }
 
                 await _dbContext.SaveChangesAsync(cancellationToken);
 
